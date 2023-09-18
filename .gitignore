@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# Hide Client ID and Authorization Token
+# Hide Client ID and Authorization
 config.js
