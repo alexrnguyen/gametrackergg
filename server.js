@@ -13,8 +13,8 @@ const PORT = process.env.PORT || 5000;
 const resultLimit = 10;
 var headers = new Headers();
 
-headers.append("Client-ID", "a6jf2zoshruhutnu1tktwuoo0diy5y");
-headers.append("Authorization", "Bearer 99soojy3jf0i6rpafexh1j9yu982q4");
+headers.append("Client-ID", config.clientID);
+headers.append("Authorization", config.authorization);
 headers.append("Content-Type", "application/json");
 app.get("/search-results/:searchInput", async (req, res) => {
   const url = "https://api.igdb.com/v4/games/";
