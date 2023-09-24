@@ -4,25 +4,15 @@ async function getImageId(gameId) {
 }
 
 async function fetchImageId(gameId) {
-  /*fetch("http://localhost:5000/query-game-id", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      parcel: gameId,
-    }),
-  });*/
-  const response = await fetch("http://localhost:5000/get-cover", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      parcel: gameId,
-    }),
-  }).catch((err) => console.log(err));
+  const response = await fetch(`http://localhost:5000/cover/${gameId}`).catch(
+    (err) => console.log(err)
+  );
   const data = await response.json();
+  console.log(gameId, data);
+  if (data.length === 0) {
+    return null;
+  }
+  setTimeout("", 200);
   return data[0].image_id;
 }
 
