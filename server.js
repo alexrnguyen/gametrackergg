@@ -26,6 +26,16 @@ app.get("/search-results/:searchInput", async (req, res) => {
   res.json(await response.json());
 });
 
+app.get("/game/:gameId", async (req, res) => {
+  const url = "https://api.igdb.com/v4/games/";
+  const response = await fetch(url, {
+    method: "POST",
+    headers: headers,
+    body: `fields name, summary; where id=${req.params.gameId};`,
+  });
+  res.json(await response.json());
+});
+
 app.get("/cover/:gameId", async (req, res) => {
   const url = "https://api.igdb.com/v4/covers/";
   const response = await fetch(url, {

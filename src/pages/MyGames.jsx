@@ -16,20 +16,20 @@ const MyGames = () => {
             <GameCard imageId={game.imageId} title={game.title}/>
           )
         })}*/}
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1wyy"} title={'The Witcher 3: Wild Hunt'}/>
-        <GameCard imageId={"co1r7f"} title={'The Last of Us'}/>
-        <GameCard imageId={"co1r7h"} title={'Uncharted 4: A Thief\'s End'}/>
-        <GameCard imageId={"co1n1x"} title={'Persona 4: Golden'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
-        <GameCard imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={1942} imageId={"co1wyy"} title={'The Witcher 3: Wild Hunt'}/>
+        <GameCard gameId={1009} imageId={"co1r7f"} title={'The Last of Us'}/>
+        <GameCard gameId={7331} imageId={"co1r7h"} title={'Uncharted 4: A Thief\'s End'}/>
+        <GameCard gameId={2985} imageId={"co1n1x"} title={'Persona 4: Golden'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
+        <GameCard gameId={9927} imageId={"co1r76"} title={'Persona 5'}/>
       </ul>
     </>
   );

@@ -6,6 +6,7 @@ import Profile from "./pages/Profile";
 import Navbar from './components/Navbar'
 import { Route, Routes, createSearchParams } from 'react-router-dom'
 import SearchResults from './pages/SearchResults'
+import GamePage from './pages/GamePage';
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="my-games" element={<MyGames />}></Route>
           <Route path="profile" element={<Profile />}></Route>
           <Route path='search-results' element={<SearchResults route={{input: ""}}/>}></Route>
+          <Route path='game/:id' element={<GamePage/>}></Route>
         </Routes>
       </div>
     </>
