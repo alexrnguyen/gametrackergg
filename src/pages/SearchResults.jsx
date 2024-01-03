@@ -1,12 +1,33 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import GameCard from "../components/GameCard";
+import { CircularProgress } from "@mui/material";
 import getImageId from "../utils/get-image-id";
+
+
+const ResultsContent = (props) => {
+    const {results} = props;
+
+    return (
+        <>
+            <h1>Search Results</h1>
+            <ul className="games">
+                {results.length === 0 && "No Games"}
+                {results.map(game => {
+                    return (
+                        <GameCard key={game.id} gameId={game.id} imageId={game.imageId} title={game.name}/>
+                    )
+                })}
+            </ul>
+        </>
+    )
+}
 
 const SearchResults = () => {
     const [results, setResults] = useState([])
     const [searchParams] = useSearchParams();
     const [input, setInput] = useState(searchParams.get("input"))
+    const [dataRetrieved, setDataRetrieved] = useState(false);
 
     useEffect(() => {
         setInput(searchParams.get("input"))
@@ -29,20 +50,15 @@ const SearchResults = () => {
             return game;
         }))
         console.log(dataWithImages)
+        setDataRetrieved(true);
         return dataWithImages;
     }
 
     return (
         <>
-            <h1>Search Results</h1>
-            <ul className="games">
-                {results.length === 0 && "No Games"}
-                {results.map(game => {
-                    return (
-                        <GameCard key={game.id} gameId={game.id} imageId={game.imageId} title={game.name}/>
-                    )
-                })}
-            </ul>
+            {dataRetrieved ? (
+                <ResultsContent results={results}/>
+            ) : <CircularProgress/>}
         </>
     )
 }

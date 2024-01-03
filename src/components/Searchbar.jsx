@@ -1,5 +1,6 @@
 import { createElement, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress"
 
 const Searchbar = () => {
   const [searchInput, setSearchInput] = useState("");
@@ -8,6 +9,7 @@ const Searchbar = () => {
   const searchGames = (e) => {
     if (e.key === 'Enter') {
       navigate(`/search-results?input=${searchInput}`);
+      window.location.reload();
     }
   }
   
