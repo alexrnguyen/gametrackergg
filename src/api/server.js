@@ -4,7 +4,7 @@ import express from "express";
 const app = express();
 import fetch from "node-fetch";
 import cors from "cors";
-import config from "./config.js";
+import config from "../../config.js";
 
 app.use(cors());
 app.use(express.json());
