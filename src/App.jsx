@@ -1,10 +1,9 @@
-import './App.css'
 import './styles.css'
 import Home from "./pages/Home";
 import MyGames from "./pages/MyGames";
 import Profile from "./pages/Profile";
 import Navbar from './components/Navbar'
-import { Route, Routes, createSearchParams } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import SearchResults from './pages/SearchResults'
 import GamePage from './pages/GamePage';
 

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   box-sizing: border-box;
 }
@@ -76,4 +80,8 @@ ul {
   align-items: center;
   place-items: center;
   gap: 1rem;
+}
+
+.icon {
+  width: 4rem;
 }
