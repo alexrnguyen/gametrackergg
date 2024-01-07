@@ -5,7 +5,8 @@ export default {
     colors: {
       black: "#000000",
       white: "#ffffff",
-      grey: "#555"
+      grey: "#555",
+      lightgrey: "#777"
     },
     extend: {
         gridTemplateColumns: {
@@ -14,7 +15,7 @@ export default {
     },
   },
   variants: {
-    backgroundColor: ['active']
+    backgroundColor: ['active', 'hover']
   },
   plugins: [],
 }

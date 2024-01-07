@@ -19,7 +19,7 @@ const Searchbar = () => {
   return (
     <div>
       <input
-        className="bg-grey w-full text-black px-1"
+        className="bg-grey w-full text-white px-1"
         type="text"
         placeholder="Search a game"
         onChange={handleChange}

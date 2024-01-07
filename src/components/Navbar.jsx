@@ -22,7 +22,7 @@ function CustomLink({ to, children }) {
   const isActive = useMatch({ path: resolvedPath.pathname, end: true });
   return (
     <li>
-      <Link className={isActive ? "bg-grey" : ""} to={to}>{children}</Link>
+      <Link className={isActive ? "bg-grey hover:bg-lightgrey" : "hover:bg-lightgrey"} to={to}>{children}</Link>
     </li>
   );
 }
