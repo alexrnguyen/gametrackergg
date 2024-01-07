@@ -34,6 +34,7 @@ const StatusContainer = (props) => {
 
     return (
         <Card variant="outlined">
+            <div className="flex flex-col">
                 <Rating
                     name="personal-rating"
                     value={rating}
@@ -55,6 +56,7 @@ const StatusContainer = (props) => {
                         <p>Wishlist</p>
                     </IconButton>
                 </ButtonGroup>
+            </div>   
         </Card>
     )
 }
@@ -100,7 +102,7 @@ const GamePage = () => {
     return (
         <>
             {dataRetrieved ? (
-                <>
+                <div className="flex flex-col items-center">
                     <h1>{gameData[0].name}</h1>
                     <img className="card-game-image" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData.imageId}.png`} alt="" />
                     <StatusContainer 
@@ -109,8 +111,8 @@ const GamePage = () => {
                         wishlistStatus={wishlistStatus.current}
                     />
                     <p>{gameData[0].summary}</p>
-                </>
-            ) : <CircularProgress/>}
+                </div>
+            ) : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}
         </>
     )
 }

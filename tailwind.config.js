@@ -1,8 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{html,js}"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    colors: {
+      black: "#000000",
+      white: "#ffffff",
+      grey: "#555"
+    },
+    extend: {
+        gridTemplateColumns: {
+          'auto-fill-200': 'repeat(auto-fill, minmax(200px, 1fr))',
+        },
+    },
+  },
+  variants: {
+    backgroundColor: ['active']
   },
   plugins: [],
 }

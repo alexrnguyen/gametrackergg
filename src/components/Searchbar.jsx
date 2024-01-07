@@ -1,6 +1,5 @@
-import { createElement, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import CircularProgress from "@mui/material/CircularProgress"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Searchbar = () => {
   const [searchInput, setSearchInput] = useState("");
@@ -20,7 +19,7 @@ const Searchbar = () => {
   return (
     <div>
       <input
-        className="searchbar"
+        className="bg-grey w-full text-black px-1"
         type="text"
         placeholder="Search a game"
         onChange={handleChange}

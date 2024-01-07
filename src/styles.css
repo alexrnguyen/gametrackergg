@@ -2,58 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-ul {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.container {
-  margin: 1rem;
-  text-align: center;
-}
-
-.searchbar {
-  background-color: #555;
-  width: 250%;
-  height: 100%;
-}
-
-.nav {
-  background-color: black;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  gap: 2rem;
-  padding: 0 1rem;
-}
-
-.site-title {
-  font-size: 2rem;
-}
-
-.nav ul {
-  display: flex;
-  gap: 1rem;
-}
-
-.nav a {
-  color: inherit;
-  font-size: x-large;
-  text-decoration: none;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0.25rem;
+:root {
+  --grey: #555;
 }
 
 .nav li.active {
@@ -62,26 +12,4 @@ ul {
 
 .nav li:hover {
   background-color: #777;
-}
-
-.game-card {
-  height: 300px;
-}
-
-.game-card img {
-  width: 200px;
-  height: 250px;
-  object-fit: contain;
-}
-
-.games {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  align-items: center;
-  place-items: center;
-  gap: 1rem;
-}
-
-.icon {
-  width: 4rem;
 }

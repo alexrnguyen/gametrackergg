@@ -12,7 +12,7 @@ function App() {
   return (
     <>
       <Navbar />
-      <div className="container">
+      <div className="w-full">
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="my-games" element={<MyGames />}></Route>

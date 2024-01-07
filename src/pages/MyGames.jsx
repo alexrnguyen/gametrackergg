@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import GameCard from "../components/GameCard";
 
 const MyGames = () => {
@@ -8,8 +8,7 @@ const MyGames = () => {
   // Games are hardcoded for now
   return (
     <>
-      <h1>My Games</h1>
-      <ul className="games">
+      <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
         {/*{games.length === 0 && "No Games"}
         {games.map(game => {
           return (
