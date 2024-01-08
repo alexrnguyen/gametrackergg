@@ -23,7 +23,7 @@ app.get("/search-results/:searchInput", async (req, res) => {
     headers: headers,
     body: `fields name; search "${req.params.searchInput}"; limit ${resultLimit};`,
   });
-  res.json(await response.json());
+  res.status(200).json(await response.json());
 });
 
 app.get("/game/:gameId", async (req, res) => {
@@ -31,9 +31,20 @@ app.get("/game/:gameId", async (req, res) => {
   const response = await fetch(url, {
     method: "POST",
     headers: headers,
-    body: `fields name, summary; where id=${req.params.gameId};`,
+    body: `fields name, summary, release_dates; where id=${req.params.gameId};`,
   });
-  res.json(await response.json());
+  res.status(200).json(await response.json());
+});
+
+app.get("/year/:dateId", async (req, res) => {
+  const url = "https://api.igdb.com/v4/release_dates/";
+  const response = await fetch(url, {
+    method: "POST",
+    headers: headers,
+    body: `fields y; where id=${req.params.dateId};`,
+  });
+  const data = await response.json();
+  res.status(200).json(data[0]);
 });
 
 app.get("/cover/:gameId", async (req, res) => {
@@ -43,7 +54,7 @@ app.get("/cover/:gameId", async (req, res) => {
     headers: headers,
     body: `fields game, image_id; where game=${req.params.gameId};`,
   });
-  res.json(await response.json());
+  res.status(200).json(await response.json());
 });
 
 app.listen(PORT, () => {
