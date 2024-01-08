@@ -2,14 +2,13 @@ import { Link, useMatch, useResolvedPath } from "react-router-dom";
 import Searchbar from "./Searchbar";
 
 function Navbar() {
-  const path = window.location.pathname;
   return (
     <nav className="bg-black text-white flex justify-between items-center gap-2 px-4 py-2">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 w-1/2">
         <Link className='text-xl' to="/">GameTracker.gg</Link>
         <Searchbar></Searchbar>
       </div>
-      <ul className="flex gap-4">
+      <ul className="flex justify-end gap-4 w-1/2">
         <CustomLink to="/my-games">My Games</CustomLink>
         <CustomLink to="/profile">Profile</CustomLink>
       </ul>

@@ -17,7 +17,6 @@ const Searchbar = () => {
     setSearchInput(e.target.value);
   };
   return (
-    <div>
       <input
         className="bg-grey w-full text-white px-1"
         type="text"
@@ -26,7 +25,6 @@ const Searchbar = () => {
         onKeyDown={searchGames}
         value={searchInput}
       />
-    </div>
   );
 };
 
