@@ -44,7 +44,11 @@ app.get("/year/:dateId", async (req, res) => {
     body: `fields y; where id=${req.params.dateId};`,
   });
   const data = await response.json();
-  res.status(200).json(data[0]);
+  if (data === null) {
+    res.status(200).json({ y: "N/A" });
+  } else {
+    res.status(200).json(data[0]);
+  }
 });
 
 app.get("/cover/:gameId", async (req, res) => {

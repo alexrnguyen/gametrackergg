@@ -6,20 +6,23 @@ import { ButtonGroup, IconButton, CircularProgress, Card, Rating, Alert } from "
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import QueueIcon from '@mui/icons-material/Queue';
 import CakeIcon from '@mui/icons-material/Cake';
+import { PlayArrowOutlined } from "@mui/icons-material";
 
 
 const StatusContainer = (props) => {
     StatusContainer.propTypes = {
         playedStatus: PropTypes.bool.isRequired,
+        playingStatus: PropTypes.bool.isRequired,
         backlogStatus: PropTypes.bool.isRequired,
         wishlistStatus: PropTypes.bool.isRequired,
         setPlayedStatus: PropTypes.func.isRequired,
+        setPlayingStatus: PropTypes.func.isRequired,
         setBacklogStatus: PropTypes.func.isRequired,
         setWishlistStatus: PropTypes.func.isRequired,
         setShowAlert: PropTypes.func.isRequired,
         setAlertContent: PropTypes.func.isRequired
     }
-    const {playedStatus, backlogStatus, wishlistStatus, setPlayedStatus, setBacklogStatus, setWishlistStatus, setShowAlert, setAlertContent} = props;
+    const {playedStatus, playingStatus, backlogStatus, wishlistStatus, setPlayedStatus, setPlayingStatus, setBacklogStatus, setWishlistStatus, setShowAlert, setAlertContent} = props;
 
     const [rating, setRating] = useState(4);
     function togglePlayedStatus() {
@@ -30,6 +33,16 @@ const StatusContainer = (props) => {
         } else {
             setAlertContent("Game removed from played games");
         }   
+    }
+
+    function togglePlayingStatus() {
+        setPlayingStatus(!playingStatus);
+        setShowAlert(true);
+        if (!playingStatus) {
+            setAlertContent("Game added to playing");
+        } else {
+            setAlertContent("Game removed from playing");
+        }
     }
 
     function toggleBacklogStatus() {
@@ -52,8 +65,9 @@ const StatusContainer = (props) => {
         }
     }
 
+    // TODO: Card width does not account for mobile devices (or any smaller screen)
     return (
-        <Card variant="outlined" className="w-96">
+        <Card variant="outlined" className="w-1/2">
             <div className="flex flex-col items-center">
                 <Rating
                     name="personal-rating"
@@ -66,6 +80,10 @@ const StatusContainer = (props) => {
                     <IconButton aria-label="played" onClick={() => togglePlayedStatus()}>
                         <SportsEsportsIcon id="played-icon" color={playedStatus ? "success" : "inherit"} />
                         <p>Played</p>
+                    </IconButton>
+                    <IconButton aria-label="playing" onClick={() => togglePlayingStatus()}>
+                        <PlayArrowOutlined id="playing-icon" color={playingStatus ? "success" : "inherit"} />
+                        <p>Playing</p>
                     </IconButton>
                     <IconButton aria-label="backlog" onClick={() => toggleBacklogStatus()}>
                         <QueueIcon id="backlog-icon" color={backlogStatus ? "info" : "inherit"}/>
@@ -95,8 +113,8 @@ const GamePage = () => {
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertContent, setAlertContent] = useState("");
-
     const [playedStatus, setPlayedStatus] = useState(false);
+    const [playingStatus, setPlayingStatus] = useState(false);
     const [backlogStatus, setBacklogStatus] = useState(false);
     const [wishlistStatus, setWishlistStatus] = useState(false);
 
@@ -106,9 +124,15 @@ const GamePage = () => {
             if (gameResponse.status === 200) {
                 let data = await gameResponse.json();
                 console.log(data);
-                const yearResponse = await fetch(`http://localhost:5000/year/${data[0].release_dates[0]}`)
-                const releaseData = await yearResponse.json();
-                const year = releaseData.y;
+
+                let year;
+                if (data[0].release_dates !== undefined) {
+                    const yearResponse = await fetch(`http://localhost:5000/year/${data[0].release_dates[0]}`)
+                    const releaseData = await yearResponse.json();
+                    year = releaseData.y;
+                } else {
+                    year = "N/A";
+                }
                 console.log(year);
                 const imageId = await getImageId(id);
                 data = {...data, imageId, year};
@@ -144,15 +168,17 @@ const GamePage = () => {
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-base">({gameData.year})</span></h1>
                         <StatusContainer 
                             playedStatus={playedStatus} 
+                            playingStatus = {playingStatus}
                             backlogStatus={backlogStatus} 
                             wishlistStatus={wishlistStatus}
                             setPlayedStatus={setPlayedStatus}
+                            setPlayingStatus={setPlayingStatus}
                             setBacklogStatus={setBacklogStatus}
                             setWishlistStatus={setWishlistStatus}
                             setShowAlert={setShowAlert}
                             setAlertContent={setAlertContent}
                         />
-                        <p>{gameData[0].summary}</p>
+                        <p>{gameData[0].summary || "No description available"}</p>
                     </div>
                     {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}
                 </div>
