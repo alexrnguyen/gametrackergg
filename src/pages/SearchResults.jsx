@@ -6,13 +6,13 @@ import getImageId from "../utils/get-image-id";
 
 
 const ResultsContent = (props) => {
-    const {results} = props;
+    const {results, input} = props;
 
+    // TODO: Show all games matching input (currently limited to 10 to avoid going over request limit)
     return (
         <>
-            <h1>Search Results</h1>
-            <ul className="games">
-                {results.length === 0 && "No Games"}
+            <h1>{results.length > 0 ? `Found ${results.length} results matching "${input}"` : `No games found matching "${input}"`} </h1>
+            <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
                 {results.map(game => {
                     return (
                         <GameCard key={game.id} gameId={game.id} imageId={game.imageId} title={game.name}/>
@@ -57,8 +57,8 @@ const SearchResults = () => {
     return (
         <>
             {dataRetrieved ? (
-                <ResultsContent results={results}/>
-            ) : <CircularProgress/>}
+                <ResultsContent results={results} input={input}/>
+            ) : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}
         </>
     )
 }
