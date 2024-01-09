@@ -6,7 +6,7 @@ import { ButtonGroup, IconButton, CircularProgress, Card, Rating, Alert } from "
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import QueueIcon from '@mui/icons-material/Queue';
 import CakeIcon from '@mui/icons-material/Cake';
-import { PlayArrowOutlined } from "@mui/icons-material";
+import { PlayArrow } from "@mui/icons-material";
 
 
 const StatusContainer = (props) => {
@@ -82,7 +82,7 @@ const StatusContainer = (props) => {
                         <p>Played</p>
                     </IconButton>
                     <IconButton aria-label="playing" onClick={() => togglePlayingStatus()}>
-                        <PlayArrowOutlined id="playing-icon" color={playingStatus ? "success" : "inherit"} />
+                        <PlayArrow id="playing-icon" color={playingStatus ? "error" : "inherit"} />
                         <p>Playing</p>
                     </IconButton>
                     <IconButton aria-label="backlog" onClick={() => toggleBacklogStatus()}>
