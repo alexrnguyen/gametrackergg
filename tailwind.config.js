@@ -6,17 +6,17 @@ export default {
       black: "#000000",
       white: "#ffffff",
       grey: "#555",
-      lightgrey: "#777"
+      lightgrey: "#777",
+      error: "#FF0000",
     },
     extend: {
-        gridTemplateColumns: {
-          'auto-fill-200': 'repeat(auto-fill, minmax(200px, 1fr))',
-        },
+      gridTemplateColumns: {
+        "auto-fill-200": "repeat(auto-fill, minmax(200px, 1fr))",
+      },
     },
   },
   variants: {
-    backgroundColor: ['active', 'hover']
+    backgroundColor: ["active", "hover"],
   },
   plugins: [],
-}
-
+};

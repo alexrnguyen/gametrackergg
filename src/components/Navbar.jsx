@@ -11,6 +11,7 @@ function Navbar() {
       <ul className="flex justify-end gap-4 w-1/2">
         <CustomLink to="/my-games">My Games</CustomLink>
         <CustomLink to="/profile">Profile</CustomLink>
+        <CustomLink to="/sign-in">Sign In</CustomLink>
       </ul>
     </nav>
   );
