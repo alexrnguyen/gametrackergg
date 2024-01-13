@@ -1,13 +1,58 @@
 import { useState } from "react";
 import GameCard from "../components/GameCard";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Cake, PlayArrow, Queue, SportsEsports } from "@mui/icons-material";
+
+
+const CategoryContainer = () => {
+
+  const [category, setCategory] = useState('played');
+
+  function handleChange(e, newCategory) {
+    setCategory(newCategory);
+
+    // TODO: Filter games based on category
+  }
+
+  return (
+      <ToggleButtonGroup 
+        className="flex gap-4" 
+        value={category}
+        defaultValue='played'
+        exclusive 
+        onChange={handleChange}
+        >
+          <ToggleButton value="played" className="flex flex-col items-center" size="small">
+            <SportsEsports id="played-icon" color="success"/>
+            <p>Played</p>
+          </ToggleButton>
+          <ToggleButton value="playing" className="flex flex-col items-center" size="small">
+            <PlayArrow id="playing-icon" color="error"/>
+            <p>Playing</p>
+          </ToggleButton>
+          <ToggleButton value="backlog" className="flex flex-col items-center" size="small">
+            <Queue id="backlog-icon" color="info"/>
+            <p>Backlog</p>
+          </ToggleButton>
+          <ToggleButton value="wishlist" className="flex flex-col items-center" size="small">
+            <Cake id="wishlist-icon" color="warning"/>
+            <p>Wishlist</p>
+          </ToggleButton>
+      </ToggleButtonGroup>
+  )
+}
 
 const MyGames = () => {
   const [games, setGames] = useState([]);
 
-
   // Games are hardcoded for now
   return (
     <>
+      <div className="flex items-center gap-4 px-4">
+        {/* TODO: Make number displayed in <p> tag dynamic (i.e. change when category is changed) */}
+        <p>14 games</p>
+        <CategoryContainer/>
+      </div>
       <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
         {/*{games.length === 0 && "No Games"}
         {games.map(game => {
