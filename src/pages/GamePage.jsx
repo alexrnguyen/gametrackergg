@@ -162,7 +162,7 @@ const GamePage = () => {
     return (
         <>
             {dataRetrieved ? (
-                <div className="game-page-container">
+                <div className="grid grid-cols-[1fr_4fr] p-4 gap-8">
                     <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData.imageId}.png`} alt="" />
                     <div id="info-container" className="flex flex-col gap-4">
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-base">({gameData.year})</span></h1>
