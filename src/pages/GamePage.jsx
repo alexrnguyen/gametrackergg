@@ -25,43 +25,21 @@ const StatusContainer = (props) => {
     const {playedStatus, playingStatus, backlogStatus, wishlistStatus, setPlayedStatus, setPlayingStatus, setBacklogStatus, setWishlistStatus, setShowAlert, setAlertContent} = props;
 
     const [rating, setRating] = useState(4);
-    function togglePlayedStatus() {
-        setPlayedStatus(!playedStatus);
-        setShowAlert(true);
-        if (!playedStatus) {
-            setAlertContent("Game added to played games");
-        } else {
-            setAlertContent("Game removed from played games");
-        }   
-    }
 
-    function togglePlayingStatus() {
-        setPlayingStatus(!playingStatus);
+    /**
+     * Toggle status given by status parameter and display alert showing whether a game was
+     * added or removed from a category
+     * @param {boolean} status Determines whether a game belongs to a category. True if a game belongs to a category, false otherwise
+     * @param {React.Dispatch<React.SetStateAction<boolean>>} setStatus Setter function for the status state variable
+     * @param {string} category Category name of status
+     */
+    function toggleStatus(status, setStatus, category) {
+        setStatus(!status);
         setShowAlert(true);
-        if (!playingStatus) {
-            setAlertContent("Game added to playing");
+        if (!status) {
+            setAlertContent(`Game added to ${category}`);
         } else {
-            setAlertContent("Game removed from playing");
-        }
-    }
-
-    function toggleBacklogStatus() {
-        setBacklogStatus(!backlogStatus);
-        setShowAlert(true);
-        if (!backlogStatus) {
-            setAlertContent("Game added to backlog");
-        } else {
-            setAlertContent("Game removed from backlog");
-        }
-    }
-
-    function toggleWishlistStatus() {
-        setWishlistStatus(!wishlistStatus);
-        setShowAlert(true);
-        if (!wishlistStatus) {
-            setAlertContent("Game added to wishlist");
-        } else {
-            setAlertContent("Game removed from wishlist");
+            setAlertContent(`Game removed from ${category}`);
         }
     }
 
@@ -77,19 +55,19 @@ const StatusContainer = (props) => {
                     onChange={(event, newRating) => setRating(newRating)}
                 />
                 <ButtonGroup>
-                    <IconButton aria-label="played" onClick={() => togglePlayedStatus()}>
+                    <IconButton aria-label="played" onClick={() => toggleStatus(playedStatus, setPlayedStatus, "played")}>
                         <SportsEsportsIcon id="played-icon" color={playedStatus ? "success" : "inherit"} />
                         <p>Played</p>
                     </IconButton>
-                    <IconButton aria-label="playing" onClick={() => togglePlayingStatus()}>
+                    <IconButton aria-label="playing" onClick={() => toggleStatus(playingStatus, setPlayingStatus, "playing")}>
                         <PlayArrow id="playing-icon" color={playingStatus ? "error" : "inherit"} />
                         <p>Playing</p>
                     </IconButton>
-                    <IconButton aria-label="backlog" onClick={() => toggleBacklogStatus()}>
+                    <IconButton aria-label="backlog" onClick={() => toggleStatus(backlogStatus, setBacklogStatus, "backlog")}>
                         <QueueIcon id="backlog-icon" color={backlogStatus ? "info" : "inherit"}/>
                         <p>Backlog</p>
                     </IconButton>
-                    <IconButton aria-label="wishlist" onClick={() => toggleWishlistStatus()}>
+                    <IconButton aria-label="wishlist" onClick={() => toggleStatus(wishlistStatus, setWishlistStatus, "wishlist")}>
                         <CakeIcon id="wishlist-icon" color={wishlistStatus ? "warning" : "inherit"}/>
                         <p>Wishlist</p>
                     </IconButton>
