@@ -1,17 +1,20 @@
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignIn = () => {
-
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
     const [invalidLogin, setInvalidLogin] = useState(false);
+
+    const navigate = useNavigate();
 
     function handleSubmit(e) {
         e.preventDefault();
         // TODO: Check if username/password is in the database
+        localStorage.setItem("username", username);
+        navigate('/');
+        window.location.reload();
     }
 
     return (
