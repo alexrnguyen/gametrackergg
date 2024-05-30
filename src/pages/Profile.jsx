@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import GameCard from "../components/GameCard";
 import ProfilePic from "../assets/test-profile-pic.jpg"
 import CategoryContainer from "../components/CategoryContainer";
-import { Cake, PlayArrow, Queue, SportsEsports } from "@mui/icons-material"; // category icons
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -67,7 +66,7 @@ const ShowcaseContent = () => {
   ]);
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-8">
       <div id="favourite-games" className="">
         <h2 className="text-xl">Favourite Games</h2>
         <ul className='flex gap-4'>

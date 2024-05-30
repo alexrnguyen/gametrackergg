@@ -61,6 +61,11 @@ app.get("/cover/:gameId", async (req, res) => {
   res.status(200).json(await response.json());
 });
 
+app.get("/sign-out", (req, res) => {
+  localStorage.setItem("username", null);
+  res.redirect('/');
+})
+
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
