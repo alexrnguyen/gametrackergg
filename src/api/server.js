@@ -15,7 +15,6 @@ var headers = new Headers();
 
 headers.append("Client-ID", config.clientID);
 headers.append("Authorization", config.authorization);
-headers.append("Content-Type", "application/json");
 app.get("/search-results/:searchInput", async (req, res) => {
   const url = "https://api.igdb.com/v4/games/";
   const response = await fetch(url, {
@@ -26,7 +25,7 @@ app.get("/search-results/:searchInput", async (req, res) => {
   res.status(200).json(await response.json());
 });
 
-app.get("/game/:gameId", async (req, res) => {
+app.get("/games/:gameId", async (req, res) => {
   const url = "https://api.igdb.com/v4/games/";
   const response = await fetch(url, {
     method: "POST",
@@ -34,6 +33,24 @@ app.get("/game/:gameId", async (req, res) => {
     body: `fields name, summary, release_dates; where id=${req.params.gameId};`,
   });
   res.status(200).json(await response.json());
+});
+
+app.get("/screenshots/:gameId", async (req, res) => {
+  const url = "https://api.igdb.com/v4/screenshots/"
+  const response = await fetch(url, {
+    method: "POST",
+    headers: headers,
+    body: `fields image_id; where game = ${req.params.gameId};`
+  });
+
+  if (response.status === 200) {
+    const data = await response.json();
+    console.log(data);
+    res.status(200).send(data);
+  } else {
+    console.log("Could not retrieve screenshots");
+    res.status(response.status).send([]);
+  }
 });
 
 app.get("/year/:dateId", async (req, res) => {

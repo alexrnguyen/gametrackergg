@@ -1,27 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import PropTypes from 'prop-types';
 import getImageId from "../utils/get-image-id";
 import { ButtonGroup, IconButton, CircularProgress, Card, Rating, Alert } from "@mui/material";
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import QueueIcon from '@mui/icons-material/Queue';
 import CakeIcon from '@mui/icons-material/Cake';
 import { PlayArrow } from "@mui/icons-material";
+import ScreenshotCarousel from "../components/ScreenshotCarousel";
 
 
 const StatusContainer = (props) => {
-    StatusContainer.propTypes = {
-        playedStatus: PropTypes.bool.isRequired,
-        playingStatus: PropTypes.bool.isRequired,
-        backlogStatus: PropTypes.bool.isRequired,
-        wishlistStatus: PropTypes.bool.isRequired,
-        setPlayedStatus: PropTypes.func.isRequired,
-        setPlayingStatus: PropTypes.func.isRequired,
-        setBacklogStatus: PropTypes.func.isRequired,
-        setWishlistStatus: PropTypes.func.isRequired,
-        setShowAlert: PropTypes.func.isRequired,
-        setAlertContent: PropTypes.func.isRequired
-    }
     const {playedStatus, playingStatus, backlogStatus, wishlistStatus, setPlayedStatus, setPlayingStatus, setBacklogStatus, setWishlistStatus, setShowAlert, setAlertContent} = props;
 
     const [rating, setRating] = useState(4);
@@ -84,7 +72,8 @@ const GamePage = () => {
             summary: null, 
         },
         imageId: null,
-        year: null
+        year: null,
+        screenshots: []
     });
     const [dataRetrieved, setDataRetrieved] = useState(false);
     const {id} = useParams();
@@ -98,11 +87,12 @@ const GamePage = () => {
 
     useEffect(() => {
         async function getGameData() {
-            const gameResponse = await fetch(`http://localhost:5000/game/${id}`);
+            const gameResponse = await fetch(`http://localhost:5000/games/${id}`);
             if (gameResponse.status === 200) {
                 let data = await gameResponse.json();
                 console.log(data);
 
+                // Retrieve year from release date
                 let year;
                 if (data[0].release_dates !== undefined) {
                     const yearResponse = await fetch(`http://localhost:5000/year/${data[0].release_dates[0]}`)
@@ -111,9 +101,12 @@ const GamePage = () => {
                 } else {
                     year = "N/A";
                 }
-                console.log(year);
+                // Get id of cover image
                 const imageId = await getImageId(id);
-                data = {...data, imageId, year};
+                // Retrieve screenshot image ids
+                const screenshotsResponse = await fetch(`http://localhost:5000/screenshots/${id}`);
+                const screenshots = await screenshotsResponse.json();
+                data = {...data, imageId, year, screenshots};
                 setDataRetrieved(true);
                 return data;
             } else {
@@ -158,6 +151,7 @@ const GamePage = () => {
                         />
                         <p>{gameData[0].summary || "No description available"}</p>
                     </div>
+                    <ScreenshotCarousel screenshots={gameData.screenshots} />
                     {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}
                 </div>
             ) : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}
