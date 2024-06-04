@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 console.log(config.clientID);
 const PORT = process.env.PORT || 5000;
-const resultLimit = 10;
+const resultLimit = 50;
 var headers = new Headers();
 
 headers.append("Client-ID", config.clientID);

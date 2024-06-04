@@ -127,7 +127,7 @@ const GamePage = () => {
         <>
             {dataRetrieved ? (
                 <div className="grid grid-cols-[1fr_4fr] p-4 gap-8">
-                    <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData[0].cover.image_id}.png`} alt="" />
+                    <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData[0].cover ? gameData[0].cover.image_id : null}.png`} alt="" />
                     <div id="info-container" className="flex flex-col gap-4">
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-3xl">({gameData.year})</span></h1>
                         <StatusContainer 
@@ -144,7 +144,7 @@ const GamePage = () => {
                         />
                         <p>{gameData[0].summary || "No description available"}</p>
                     </div>
-                    <ScreenshotCarousel screenshots={gameData[0].screenshots} />
+                    {gameData[0].screenshots ? <ScreenshotCarousel screenshots={gameData[0].screenshots} /> : null}
                     {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}
                 </div>
             ) : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}

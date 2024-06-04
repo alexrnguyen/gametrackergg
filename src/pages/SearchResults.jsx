@@ -14,7 +14,7 @@ const ResultsContent = (props) => {
             <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
                 {results.map(game => {
                     return (
-                        <GameCard key={game.id} gameId={game.id} imageId={game.cover.image_id} title={game.name}/>
+                        <GameCard key={game.id} gameId={game.id} imageId={game.cover ? game.cover.image_id : null} title={game.name}/>
                     )
                 })}
             </ul>
