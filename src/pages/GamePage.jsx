@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import getImageId from "../utils/get-image-id";
 import { ButtonGroup, IconButton, CircularProgress, Card, Rating, Alert } from "@mui/material";
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import QueueIcon from '@mui/icons-material/Queue';
@@ -92,21 +91,15 @@ const GamePage = () => {
                 let data = await gameResponse.json();
                 console.log(data);
 
-                // Retrieve year from release date
+                // Retrieve year from initial release date (first date listed)
                 let year;
                 if (data[0].release_dates !== undefined) {
-                    const yearResponse = await fetch(`http://localhost:5000/year/${data[0].release_dates[0]}`)
-                    const releaseData = await yearResponse.json();
-                    year = releaseData.y;
+                    year = data[0].release_dates[0].y;
                 } else {
                     year = "N/A";
                 }
-                // Get id of cover image
-                const imageId = await getImageId(id);
-                // Retrieve screenshot image ids
-                const screenshotsResponse = await fetch(`http://localhost:5000/screenshots/${id}`);
-                const screenshots = await screenshotsResponse.json();
-                data = {...data, imageId, year, screenshots};
+
+                data = {...data, year};
                 setDataRetrieved(true);
                 return data;
             } else {
@@ -134,7 +127,7 @@ const GamePage = () => {
         <>
             {dataRetrieved ? (
                 <div className="grid grid-cols-[1fr_4fr] p-4 gap-8">
-                    <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData.imageId}.png`} alt="" />
+                    <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData[0].cover.image_id}.png`} alt="" />
                     <div id="info-container" className="flex flex-col gap-4">
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-3xl">({gameData.year})</span></h1>
                         <StatusContainer 
@@ -151,7 +144,7 @@ const GamePage = () => {
                         />
                         <p>{gameData[0].summary || "No description available"}</p>
                     </div>
-                    <ScreenshotCarousel screenshots={gameData.screenshots} />
+                    <ScreenshotCarousel screenshots={gameData[0].screenshots} />
                     {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}
                 </div>
             ) : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}

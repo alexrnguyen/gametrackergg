@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import GameCard from "../components/GameCard";
 import { CircularProgress } from "@mui/material";
-import getImageId from "../utils/get-image-id";
 
 
 const ResultsContent = (props) => {
@@ -15,7 +14,7 @@ const ResultsContent = (props) => {
             <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
                 {results.map(game => {
                     return (
-                        <GameCard key={game.id} gameId={game.id} imageId={game.imageId} title={game.name}/>
+                        <GameCard key={game.id} gameId={game.id} imageId={game.cover.image_id} title={game.name}/>
                     )
                 })}
             </ul>
@@ -42,16 +41,8 @@ const SearchResults = () => {
     async function getData(input = "") {
         const response = await fetch(`http://localhost:5000/search-results/${input}`)
         const data = await response.json();
-        console.log(data)
-        const dataWithImages = await Promise.all(data.map(async (game) => {
-            console.log(game.id);
-            const imageId = await getImageId(game.id);
-            game = {...game, imageId}
-            return game;
-        }))
-        console.log(dataWithImages)
         setDataRetrieved(true);
-        return dataWithImages;
+        return data;
     }
 
     return (

@@ -20,60 +20,17 @@ app.get("/search-results/:searchInput", async (req, res) => {
   const response = await fetch(url, {
     method: "POST",
     headers: headers,
-    body: `fields name; search "${req.params.searchInput}"; limit ${resultLimit};`,
+    body: `fields name, cover.*; search "${req.params.searchInput}"; limit ${resultLimit};`,
   });
   res.status(200).json(await response.json());
 });
 
-app.get("/games/:gameId", async (req, res) => {
+app.get("/games/:id", async (req, res) => {
   const url = "https://api.igdb.com/v4/games/";
   const response = await fetch(url, {
     method: "POST",
     headers: headers,
-    body: `fields name, summary, release_dates; where id=${req.params.gameId};`,
-  });
-  res.status(200).json(await response.json());
-});
-
-app.get("/screenshots/:gameId", async (req, res) => {
-  const url = "https://api.igdb.com/v4/screenshots/"
-  const response = await fetch(url, {
-    method: "POST",
-    headers: headers,
-    body: `fields image_id; where game = ${req.params.gameId};`
-  });
-
-  if (response.status === 200) {
-    const data = await response.json();
-    console.log(data);
-    res.status(200).send(data);
-  } else {
-    console.log("Could not retrieve screenshots");
-    res.status(response.status).send([]);
-  }
-});
-
-app.get("/year/:dateId", async (req, res) => {
-  const url = "https://api.igdb.com/v4/release_dates/";
-  const response = await fetch(url, {
-    method: "POST",
-    headers: headers,
-    body: `fields y; where id=${req.params.dateId};`,
-  });
-  const data = await response.json();
-  if (data === null) {
-    res.status(200).json({ y: "N/A" });
-  } else {
-    res.status(200).json(data[0]);
-  }
-});
-
-app.get("/cover/:gameId", async (req, res) => {
-  const url = "https://api.igdb.com/v4/covers/";
-  const response = await fetch(url, {
-    method: "POST",
-    headers: headers,
-    body: `fields game, image_id; where game=${req.params.gameId};`,
+    body: `fields name, summary, cover.*, release_dates.*, genres.*, platforms.*, involved_companies.*, screenshots.*; where id=${req.params.id};`,
   });
   res.status(200).json(await response.json());
 });
