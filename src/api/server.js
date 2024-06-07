@@ -35,6 +35,17 @@ app.get("/games/:id", async (req, res) => {
   res.status(200).json(await response.json());
 });
 
+app.get("/companies/:id", async (req, res) => {
+  const url = "https://api.igdb.com/v4/companies/";
+  const response = await fetch(url, {
+    method: "POST",
+    headers: headers,
+    body: `fields name; where id=${req.params.id};`,
+  });
+  const data = await response.json();
+  res.status(200).json({name: data[0].name});
+})
+
 app.get("/sign-out", (req, res) => {
   localStorage.setItem("username", null);
   res.redirect('/');

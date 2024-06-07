@@ -26,14 +26,14 @@ function ScreenshotCarousel({ screenshots }) {
     }
 
     return (
-        <div className="col-start-2 flex flex-col items-center gap-4 mb-4">
+        <div className="flex flex-col items-center gap-4 mb-4">
             <div className="relative flex gap-4 justify-center items-center max-h-96">
                 {/* Left Arrow */}
                 <BsArrowLeftCircleFill className="w-16 h-16 md:w-12 md:h-12 left-4 hover:cursor-pointer filter" onClick={prevScreenshot} />
 
                 {/* Screenshot*/}
                 {screenshots.map((item, index) => {
-                    return <img key = {item.image_id} src={`https://images.igdb.com/igdb/image/upload/t_original/${item.image_id}.webp`} className={currentScreenshot=== index ? "max-w-4/5 max-h-96 rounded-lg shadow" : "hidden"}></img>
+                    return <img key = {item.image_id} src={`https://images.igdb.com/igdb/image/upload/t_original/${item.image_id}.webp`} className={currentScreenshot=== index ? "w-4/5 max-h-96 rounded-lg shadow" : "hidden"}></img>
                 })}
                 {/* Right Arrow */}
                 <BsArrowRightCircleFill className="w-16 h-16 md:w-12 md:h-12 right-4 hover:cursor-pointer filter" onClick={nextScreenshot} />

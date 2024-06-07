@@ -32,7 +32,7 @@ const StatusContainer = (props) => {
 
     // TODO: Card width does not account for mobile devices (or any smaller screen)
     return (
-        <Card variant="outlined" className="w-1/2">
+        <Card variant="outlined" className="h-fit">
             <div className="flex flex-col items-center">
                 <Rating
                     name="personal-rating"
@@ -99,7 +99,41 @@ const GamePage = () => {
                     year = "N/A";
                 }
 
-                data = {...data, year};
+                // Retrive names of involved companies (developer(s) and publisher(s))
+                const fetchPromises = data[0].involved_companies.map(async (companyJSON) => {
+                    try {
+                      // Fetch data from the URL
+                      const response = await fetch(`http://localhost:5000/companies/${companyJSON.company}`);
+                
+                      // Check if the response is ok (status is in the range 200-299)
+                      if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                      }
+                
+                      // Parse the JSON data from the response
+                      const data = await response.json();
+                      
+                      // Return the data
+                      return data;
+                
+                    } catch (error) {
+                      // Handle any errors that occurred during the fetch
+                      console.error(`Failed to fetch data from http://localhost:5000/companies/${companyJSON.company}:`, error);
+                      // Return null or some error indicator to handle errors gracefully
+                      return null;
+                    }
+                });
+                
+                // Wait for all fetch promises to complete
+                const companies = await Promise.all(fetchPromises);
+                
+                for (let i = 0; i < companies.length; i++) {
+                    companies[i]["developer"] = data[0].involved_companies[i]["developer"];
+                    companies[i]["publisher"] = data[0].involved_companies[i]["publisher"];
+                }
+                
+                data = {...data, year, companies};
+
                 setDataRetrieved(true);
                 return data;
             } else {
@@ -144,7 +178,35 @@ const GamePage = () => {
                         />
                         <p>{gameData[0].summary || "No description available"}</p>
                     </div>
-                    {gameData[0].screenshots ? <ScreenshotCarousel screenshots={gameData[0].screenshots} /> : null}
+                    <div className="justify-self-center flex flex-col gap-4">
+                        <div>
+                            <p className="font-bold underline">Genres</p>
+                            {gameData[0].genres.map(genre => {
+                                return <p key={genre.name}>{genre.name}</p>
+                            })}
+                        </div>
+                        <div>
+                            <p className="font-bold underline">Platforms</p>
+                            {gameData[0].platforms.map(platform => {
+                                return <p key={platform.name}>{platform.name}</p>
+                            })}
+                        </div>
+                        <div>
+                            <p className="font-bold underline">Developers:</p>
+                            {gameData.companies.filter(company => company.developer).map(developer => {
+                                return <p key={developer.name}>{developer.name}</p>
+                            })}
+                        </div>
+                        <div>
+                            <p className="font-bold underline">Publishers:</p>
+                            {gameData.companies.filter(company => company.publisher).map(publisher => {
+                                return <p key={publisher.name}>{publisher.name}</p>
+                            })}
+                        </div>
+                    </div>
+                    <div className="col-start-2">
+                        {gameData[0].screenshots ? <ScreenshotCarousel screenshots={gameData[0].screenshots} /> : null}
+                    </div>
                     {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}
                 </div>
             ) : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}
