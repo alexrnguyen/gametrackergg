@@ -1,7 +1,15 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
-import config from "../../config.js";
+const mongoose = require("mongoose");
+const config = require("./config.js");
+
+const connectionParams = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}
+
+mongoose.connect(config.atlasURI, connectionParams).then(() => console.log("Connected to database")).catch((err) => console.log(err));
+
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(config.atlasURI, {
+/* const client = new MongoClient(config.atlasURI, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -30,4 +38,4 @@ async function run() {
     await client.close();
   }
 }
-run().catch(console.dir);
+run().catch(console.dir); */

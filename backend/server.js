@@ -1,11 +1,10 @@
 // Referenced: https://www.youtube.com/watch?v=5CFafWpWwxo&t=694s
 
-import express from "express";
-const app = express();
-import fetch from "node-fetch";
-import cors from "cors";
-import config from "../../config.js";
+const express = require("express");
+const cors = require("cors");
+const config = require("./config.js")
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 console.log(config.clientID);
