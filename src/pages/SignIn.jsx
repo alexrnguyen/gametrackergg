@@ -9,12 +9,27 @@ const SignIn = () => {
 
     const navigate = useNavigate();
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
         // TODO: Check if username/password is in the database
-        localStorage.setItem("username", username);
-        navigate('/');
-        window.location.reload();
+        const data = {username, password};
+        const response = await fetch("http://localhost:5000/signin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            localStorage.setItem("username", username);
+            navigate('/');
+            window.location.reload();
+        } else {
+            console.log("Invalid login");
+            setInvalidLogin(true);
+            console.log(invalidLogin);
+        }
     }
 
     return (
@@ -38,7 +53,7 @@ const SignIn = () => {
                             onChange={(e) => setPassword(e.target.value)} 
                             required
                         />
-                        <p id="signin-error" className="text-error hidden">Invalid username or password</p>
+                        {invalidLogin ? <p id="signin-error" className="text-error">Invalid username or password</p> : null}
                         <p>Don&#39;t have an account? <Link className="font-bold" to="/sign-up">Sign Up</Link></p>
                     </div>
                     <Button type="submit" variant="contained" color="success">Sign In</Button>

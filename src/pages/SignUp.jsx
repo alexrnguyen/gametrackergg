@@ -1,6 +1,6 @@
-import { Button, TextField } from "@mui/material";
+import { Alert, Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 /**
  * 
@@ -14,25 +14,47 @@ const SignUp = () => {
     const [passwordConfirm, setPasswordConfirm] = useState("");
 
     const [passwordsMatch, setPasswordsMatch] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+
+    const navigate = useNavigate();
 
     /**
      * 
      * @param {*} e 
      */
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
 
         if (password === passwordConfirm) {
-            document.getElementById("password-mismatch").classList.add("hidden");
             setPasswordsMatch(true);
-            console.log(username, email, password);
+            const data = {username, email, password};
 
             // TODO: Add user to the database
+            const response = await fetch("http://localhost:5000/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
 
-            console.log("User Registered!");
+            if (response.status === 201) {
+                localStorage.setItem("username", username);
+                setShowAlert(true);
+                setErrorMessage("");
+                setTimeout(() => {
+                    navigate('/');
+                    window.location.reload();
+                }, 2000);
+            } else {
+                // Something went wrong. Retrieve and display error message
+                const data = await response.json();
+                setErrorMessage(data.message);
+            }
         } else {
-            document.getElementById("password-mismatch").classList.remove("hidden");
             setPasswordsMatch(false);
+            setErrorMessage("Passwords do not match!");
         }
     }
 
@@ -78,12 +100,13 @@ const SignUp = () => {
                             onChange={(e) => setPasswordConfirm(e.target.value)} 
                             required
                         />
-                        <p id="password-mismatch" className="text-error hidden">Passwords do not match</p>
+                        {errorMessage ? <p id="signup-error" className="text-error">{errorMessage}</p> : null}
                         <p>Already have an account? <Link className="font-bold" to="/sign-in">Sign In</Link></p>
                     </div>
                     <Button type="submit" variant="contained" color="success">Sign Up</Button>
                 </div>
             </form>
+            {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">Account successfully created!</Alert> : null}
         </div>
     )
 }

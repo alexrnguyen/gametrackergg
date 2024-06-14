@@ -54,6 +54,30 @@ app.get("/companies/:id", async (req, res) => {
   res.status(200).json({name: data[0].name});
 })
 
+app.post("/signin", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (username === undefined || password === undefined) {
+    return res.status(400).send({message: "Missing required field in request body (username, email, and/or password)"});
+  }
+
+  const user = await User.findOne({username: username});
+
+  if (user !== null) {
+    const hash = user.password_hash
+    // Check that inputted password matches hash in the database
+    const match = await bcrypt.compare(password, hash);
+    if (match) {
+      // successful login
+      return res.status(200).send();
+    }
+  } 
+  // unsuccessful login
+  res.status(401).send({message: "Username and/or password is incorrect"});
+
+})
+
 app.post("/signup", (req, res) => {
   console.log(req.body);
   const username = req.body.username;
@@ -66,14 +90,24 @@ app.post("/signup", (req, res) => {
   }
   
 
-  bcrypt.hash(password, 10, function(err, hash) {
+  bcrypt.hash(password, 10, async function(err, hash) {
     if (err) {
-      res.status(500).send({message: "Failed to register user."});
+      res.status(500).send({message: "Failed to register user. Please try again..."});
       return;
     }
+    // Create new user
     const user = new User({username, email, password_hash: hash});
-    user.save();
-    res.status(201).redirect('/');
+    try {
+      await user.save();
+      res.status(201).send();
+    } catch (err) {
+      // Handle duplicate key error (username and/or email exists in database)
+      if (err && err.code === 11000) {
+        res.status(400).send({message: "Username or email already taken!"});
+      } else {
+        res.status(500).send({message: "Internal server error! Please try again..."});
+      }
+    }
   })
 })
 
