@@ -11,7 +11,7 @@ const SignIn = () => {
 
     async function handleSubmit(e) {
         e.preventDefault();
-        // TODO: Check if username/password is in the database
+        // Check if user with corresponding password is in the database
         const data = {username, password};
         const response = await fetch("http://localhost:5000/signin", {
             method: "POST",
@@ -22,7 +22,9 @@ const SignIn = () => {
         });
 
         if (response.ok) {
-            localStorage.setItem("username", username);
+            const data = await response.json();
+            localStorage.setItem("username", data.username);
+            localStorage.setItem("userId", data.userId);
             navigate('/');
             window.location.reload();
         } else {
