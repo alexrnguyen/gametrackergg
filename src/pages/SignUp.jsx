@@ -31,7 +31,7 @@ const SignUp = () => {
             const data = {username, email, password};
 
             // TODO: Add user to the database
-            const response = await fetch("http://localhost:5000/signup", {
+            const response = await fetch("http://localhost:5000/api/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

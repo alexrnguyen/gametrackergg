@@ -10,7 +10,7 @@ const MyGames = () => {
   
   useEffect(() => {
     async function GetGames(userId, category) {
-      const response = await fetch(`http://localhost:5000/collection/${userId}?status=${category}`);
+      const response = await fetch(`http://localhost:5000/api/collection/${userId}?status=${category}`);
       if (response.ok) {
         const games = await response.json();
         setGamesToDisplay(games);

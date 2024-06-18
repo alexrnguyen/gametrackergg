@@ -19,7 +19,7 @@ const StatusContainer = (props) => {
         async function getUserGameStatus() {
             // Get user's status and rating for the game
 
-            const response = await fetch(`http://localhost:5000/collection/${userId}/game/${id}`);
+            const response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}`);
             const data = await response.json();
 
             switch(data.status) {
@@ -51,7 +51,7 @@ const StatusContainer = (props) => {
      */
     async function toggleStatus(status, setStatus, category) {
         const data = {gameId: id, status: category, rating: rating};
-        const response = await fetch(`http://localhost:5000/collection/${userId}`, {
+        const response = await fetch(`http://localhost:5000/api/collection/${userId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -129,7 +129,7 @@ const GamePage = () => {
 
     useEffect(() => {
         async function getGameData() {
-            const gameResponse = await fetch(`http://localhost:5000/games/${id}`);
+            const gameResponse = await fetch(`http://localhost:5000/api/games/${id}`);
             if (gameResponse.status === 200) {
                 let data = await gameResponse.json();
                 console.log(data);
@@ -146,7 +146,7 @@ const GamePage = () => {
                 const fetchPromises = data[0].involved_companies.map(async (companyJSON) => {
                     try {
                       // Fetch data from the URL
-                      const response = await fetch(`http://localhost:5000/companies/${companyJSON.company}`);
+                      const response = await fetch(`http://localhost:5000/api/companies/${companyJSON.company}`);
                 
                       // Check if the response is ok (status is in the range 200-299)
                       if (!response.ok) {
@@ -161,7 +161,7 @@ const GamePage = () => {
                 
                     } catch (error) {
                       // Handle any errors that occurred during the fetch
-                      console.error(`Failed to fetch data from http://localhost:5000/companies/${companyJSON.company}:`, error);
+                      console.error(`Failed to fetch data from http://localhost:5000/api/companies/${companyJSON.company}:`, error);
                       // Return null or some error indicator to handle errors gracefully
                       return null;
                     }

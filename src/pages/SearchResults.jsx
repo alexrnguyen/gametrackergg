@@ -41,7 +41,7 @@ const SearchResults = () => {
     }, [input])
 
     async function getData(input = "") {
-        const response = await fetch(`http://localhost:5000/games?searchInput=${input}`)
+        const response = await fetch(`http://localhost:5000/api/games?searchInput=${input}`)
         const data = await response.json();
         setDataRetrieved(true);
         return data;

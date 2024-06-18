@@ -1,6 +1,7 @@
 // Referenced: https://www.youtube.com/watch?v=5CFafWpWwxo&t=694s
 
 const express = require("express");
+const router = express.Router();
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const bodyParser = require("body-parser");
@@ -25,7 +26,7 @@ const UserGameStatus = require("./models/UserGameStatus.js");
 
 headers.append("Client-ID", config.clientID);
 headers.append("Authorization", config.authorization);
-app.get("/games", async (req, res) => {
+router.get("/games", async (req, res) => {
   // Search for a games based on search input query parameter
   const searchInput = req.query.searchInput;
   const url = "https://api.igdb.com/v4/games/";
@@ -37,7 +38,7 @@ app.get("/games", async (req, res) => {
   res.status(200).json(await response.json());
 });
 
-app.get("/games/:id", async (req, res) => {
+router.get("/games/:id", async (req, res) => {
   const url = "https://api.igdb.com/v4/games/";
   const response = await fetch(url, {
     method: "POST",
@@ -47,7 +48,7 @@ app.get("/games/:id", async (req, res) => {
   res.status(200).json(await response.json());
 });
 
-app.get("/companies/:id", async (req, res) => {
+router.get("/companies/:id", async (req, res) => {
   const url = "https://api.igdb.com/v4/companies/";
   const response = await fetch(url, {
     method: "POST",
@@ -60,7 +61,7 @@ app.get("/companies/:id", async (req, res) => {
 })
 
 // Get all games in a user's collection (can filter by status)
-app.get("/collection/:userId", async (req, res) => {
+router.get("/collection/:userId", async (req, res) => {
   // Filter games by status if specified in query parameters
   const userId = req.params.userId;
   const status = req.query.status;
@@ -88,7 +89,7 @@ app.get("/collection/:userId", async (req, res) => {
 })
 
 // Add game to a user's collection
-app.post("/collection/:userId", async (req, res) => {
+router.post("/collection/:userId", async (req, res) => {
   const userId = req.params.userId;
   const gameId = req.body.gameId;
   let status = req.body.status;
@@ -136,7 +137,7 @@ app.post("/collection/:userId", async (req, res) => {
   }
 });
 
-app.get("/collection/:userId/game/:gameId", async (req, res) => {
+router.get("/collection/:userId/game/:gameId", async (req, res) => {
   const userId = req.params.userId;
   const gameId = req.params.gameId;
 
@@ -150,7 +151,7 @@ app.get("/collection/:userId/game/:gameId", async (req, res) => {
 
 });
 
-app.post("/signin", async (req, res) => {
+router.post("/signin", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
@@ -174,7 +175,7 @@ app.post("/signin", async (req, res) => {
 
 })
 
-app.post("/signup", (req, res) => {
+router.post("/signup", (req, res) => {
   console.log(req.body);
   const username = req.body.username;
   const email = req.body.email;
@@ -207,10 +208,12 @@ app.post("/signup", (req, res) => {
   })
 })
 
-app.get("/sign-out", (req, res) => {
+router.get("/sign-out", (req, res) => {
   localStorage.setItem("username", null);
   res.redirect('/');
 })
+
+app.use("/api/", router);
 
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`);

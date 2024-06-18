@@ -13,7 +13,7 @@ const SignIn = () => {
         e.preventDefault();
         // Check if user with corresponding password is in the database
         const data = {username, password};
-        const response = await fetch("http://localhost:5000/signin", {
+        const response = await fetch("http://localhost:5000/api/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
