@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import GameCard from "../components/GameCard";
 import { CircularProgress } from "@mui/material";
-
+import Pagination from '@mui/material/Pagination';
 
 const ResultsContent = (props) => {
     const {results, input} = props;
 
-    // TODO: Show all games matching input (currently limited to 10 to avoid going over request limit)
     return (
         <>
-            <h1 className="pl-2">{results.length > 0 ? `Found ${results.length} results matching "${input}"` : `No games found matching "${input}"`} </h1>
+            <h1 className="pl-8">{results.length > 0 ? `Found ${results.length} results matching "${input}"` : `No games found matching "${input}"`} </h1>
             <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
                 {results.map(game => {
                     return (
@@ -18,6 +17,9 @@ const ResultsContent = (props) => {
                     )
                 })}
             </ul>
+            <div className="flex justify-center py-2">
+                <Pagination />
+            </div>
         </>
     )
 }
@@ -39,7 +41,7 @@ const SearchResults = () => {
     }, [input])
 
     async function getData(input = "") {
-        const response = await fetch(`http://localhost:5000/search-results/${input}`)
+        const response = await fetch(`http://localhost:5000/games?searchInput=${input}`)
         const data = await response.json();
         setDataRetrieved(true);
         return data;

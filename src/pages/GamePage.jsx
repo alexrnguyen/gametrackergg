@@ -11,7 +11,36 @@ import ScreenshotCarousel from "../components/ScreenshotCarousel";
 const StatusContainer = (props) => {
     const {playedStatus, playingStatus, backlogStatus, wishlistStatus, setPlayedStatus, setPlayingStatus, setBacklogStatus, setWishlistStatus, setShowAlert, setAlertContent} = props;
 
-    const [rating, setRating] = useState(4);
+    const [rating, setRating] = useState();
+    const {id} = useParams();
+    const userId = localStorage.getItem("userId");
+
+    useEffect(() => {
+        async function getUserGameStatus() {
+            // Get user's status and rating for the game
+
+            const response = await fetch(`http://localhost:5000/collection/${userId}/game/${id}`);
+            const data = await response.json();
+
+            switch(data.status) {
+                case "playing":
+                    setPlayingStatus(true);
+                    break;
+                case "played":
+                    setPlayedStatus(true);
+                    break;
+                case "backlog":
+                    setBacklogStatus(true);
+                    break;
+                case "wishlist":
+                    setWishlistStatus(true);
+                    break;
+            }
+            setRating(data.rating);
+        }
+
+        getUserGameStatus();
+    }, [])
 
     /**
      * Toggle status given by status parameter and display alert showing whether a game was
@@ -20,13 +49,27 @@ const StatusContainer = (props) => {
      * @param {React.Dispatch<React.SetStateAction<boolean>>} setStatus Setter function for the status state variable
      * @param {string} category Category name of status
      */
-    function toggleStatus(status, setStatus, category) {
-        setStatus(!status);
-        setShowAlert(true);
-        if (!status) {
-            setAlertContent(`Game added to ${category}`);
+    async function toggleStatus(status, setStatus, category) {
+        const data = {gameId: id, status: category, rating: rating};
+        const response = await fetch(`http://localhost:5000/collection/${userId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.status === 201) {
+            setStatus(!status);
+            setShowAlert(true);
+            if (!status) {
+                setAlertContent(`Game added to ${category}`);
+            } else {
+                setAlertContent(`Game removed from ${category}`);
+            }
         } else {
-            setAlertContent(`Game removed from ${category}`);
+            // TODO: Add error handling (alert user that something went wrong)
+            // ...
         }
     }
 
@@ -36,7 +79,7 @@ const StatusContainer = (props) => {
             <div className="flex flex-col items-center">
                 <Rating
                     name="personal-rating"
-                    value={rating}
+                    value={rating ? rating : ""}
                     precision={0.5}
                     size="large"
                     onChange={(event, newRating) => setRating(newRating)}
@@ -143,7 +186,6 @@ const GamePage = () => {
 
         const fetchData = async () => {
             const queriedData = await getGameData();
-            console.log(queriedData);
             setGameData(queriedData);
         }
         fetchData();

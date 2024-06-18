@@ -8,8 +8,8 @@ const GameCard = ({gameId, imageId, title}) => {
     }
 
     return (
-        <div onClick={handleClick}>
-            <img className="w-52 h-64 object-contain" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${imageId}.png`} alt="" />
+        <div className="flex flex-col justify-center w-52 h-64" onClick={handleClick}>
+            <img className="max-h-52 object-contain" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${imageId}.png`} alt="" />
             <div className="card-game-title text-center">{title}</div>
         </div>
     )
