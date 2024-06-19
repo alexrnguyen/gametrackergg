@@ -49,6 +49,8 @@ router.get("/games/:id", async (req, res) => {
 });
 
 router.get("/companies/:id", async (req, res) => {
+  // TODO: Change body to use comma separated ids (to retrieve all company names in 1 request)
+  // e.g. ... where id = (1, 2, 3);
   const url = "https://api.igdb.com/v4/companies/";
   const response = await fetch(url, {
     method: "POST",
@@ -60,6 +62,41 @@ router.get("/companies/:id", async (req, res) => {
   res.status(200).json({name: data[0].name});
 })
 
+// Get user's current status and rating for a game
+router.get("/collection/:userId/game/:gameId", async (req, res) => {
+  const userId = req.params.userId;
+  const gameId = req.params.gameId;
+
+  const gameStatus = await UserGameStatus.findOne({userId: userId, gameId: gameId});
+
+  if (gameStatus === null) {
+    res.status(404).send({status: null, rating: null});
+  } else {
+    res.status(200).send({status: gameStatus.status, rating: gameStatus.rating});
+  }
+});
+
+// Remove a game's status from a user's collection
+router.delete("/collection/:userId/game/:gameId", async (req, res) => {
+  const userId = req.params.userId;
+  const gameId = req.params.gameId;
+  const gameStatus = await UserGameStatus.findOne({userId: userId, gameId: gameId});
+
+  if (gameStatus === null) {
+    res.status(404).send();
+  } else {
+    if (gameStatus.rating !== null) {
+      gameStatus.status = null;
+      gameStatus.save();
+      res.status(200).send();
+    } else {
+      // Delete game status from database (no rating or status associated with game for a particular user)
+      await UserGameStatus.deleteOne({userId: userId, gameId: gameId});
+      res.status(204).send();
+    }
+  }
+});
+
 // Get all games in a user's collection (can filter by status)
 router.get("/collection/:userId", async (req, res) => {
   // Filter games by status if specified in query parameters
@@ -69,14 +106,14 @@ router.get("/collection/:userId", async (req, res) => {
 
   if (status === undefined) {
     // Get all games in a user's collection
-    documents = await UserGameStatus.find({userId: userId});
+    documents = await UserGameStatus.find({userId: userId}).sort({rating: -1});
 
   } else {
     // Get all games with a specific status in a user's collection
     if (status !== "playing" && status !== "played" && status !== "backlog" && status !== "wishlist") {
       return res.status(400).send({message: "Status query parameter must be one of the following: playing, played, backlog, wishlist."});
     }
-    documents = await UserGameStatus.find({userId: userId, status: status});
+    documents = await UserGameStatus.find({userId: userId, status: status}).sort({rating: -1});
   }
 
   const queries = [];
@@ -137,16 +174,48 @@ router.post("/collection/:userId", async (req, res) => {
   }
 });
 
-router.get("/collection/:userId/game/:gameId", async (req, res) => {
+// TODO: Change a game's status in a user's collection
+router.put("/collection/:userId", async (req, res) => {
+
+})
+
+// TODO: Add rating to a game in a user's collection
+router.post("/collection/:userId/rating", async (req, res) => {
+  
+});
+
+// Change a game's rating in a user's collection
+router.put("/collection/:userId/rating", async (req, res) => {
   const userId = req.params.userId;
-  const gameId = req.params.gameId;
+  const gameId = req.body.gameId;
+  const rating = req.body.rating;
 
-  const gameStatus = await UserGameStatus.findOne({userId: userId, gameId: gameId});
+  // Add game to database if it does not exist (REUSED CODE)
+  const game = await Game.findOne({gameId: gameId});
+  if (game === null) {
+    // Get game name and cover from IGDB
+    const url = "https://api.igdb.com/v4/games/";
+    const gameResponse = await fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: `fields name, cover.*; where id=${gameId};`,
+    });
+    const data = (await gameResponse.json())[0];
+    const gameToAdd = new Game({gameId: gameId, name: data.name, cover: data.cover.image_id});
+    await gameToAdd.save();
+  }
 
-  if (gameStatus === null) {
-    res.status(404).send({status: null, rating: null});
+  // Check if the user already has a status associated with the game
+  const existingGameStatus = await UserGameStatus.findOne({userId: userId, gameId: gameId});
+  if (existingGameStatus === null) {
+    const gameStatus = new UserGameStatus({userId, gameId, status: null, rating});
+    await gameStatus.save();
+    res.status(201).send();
   } else {
-    res.status(200).send({status: gameStatus.status, rating: gameStatus.rating});
+    // Add rating to the user's game status document
+    existingGameStatus.rating = rating;
+    await existingGameStatus.save();
+    res.status(200).send();
   }
 
 });
@@ -186,7 +255,6 @@ router.post("/signup", (req, res) => {
     return;
   }
   
-
   bcrypt.hash(password, 10, async function(err, hash) {
     if (err) {
       res.status(500).send({message: "Failed to register user. Please try again..."});

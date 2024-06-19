@@ -9,16 +9,20 @@ import ScreenshotCarousel from "../components/ScreenshotCarousel";
 
 
 const StatusContainer = (props) => {
-    const {playedStatus, playingStatus, backlogStatus, wishlistStatus, setPlayedStatus, setPlayingStatus, setBacklogStatus, setWishlistStatus, setShowAlert, setAlertContent} = props;
+    const {setShowAlert, setAlertContent} = props;
 
-    const [rating, setRating] = useState();
+    const [playedStatus, setPlayedStatus] = useState(false);
+    const [playingStatus, setPlayingStatus] = useState(false);
+    const [backlogStatus, setBacklogStatus] = useState(false);
+    const [wishlistStatus, setWishlistStatus] = useState(false);
+    const [rating, setRating] = useState(0);
     const {id} = useParams();
     const userId = localStorage.getItem("userId");
 
     useEffect(() => {
         async function getUserGameStatus() {
             // Get user's status and rating for the game
-
+            console.log("Rerender triggered")
             const response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}`);
             const data = await response.json();
 
@@ -40,7 +44,7 @@ const StatusContainer = (props) => {
         }
 
         getUserGameStatus();
-    }, [])
+    }, [id, userId, rating, playingStatus, playedStatus, backlogStatus, wishlistStatus]);
 
     /**
      * Toggle status given by status parameter and display alert showing whether a game was
@@ -51,22 +55,49 @@ const StatusContainer = (props) => {
      */
     async function toggleStatus(status, setStatus, category) {
         const data = {gameId: id, status: category, rating: rating};
-        const response = await fetch(`http://localhost:5000/api/collection/${userId}`, {
-            method: "POST",
+        let response;
+        if (!status) {
+            setAlertContent(`Game added to ${category}`);
+            response = await fetch(`http://localhost:5000/api/collection/${userId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+        } else {
+            setAlertContent(`Game removed from ${category}`);
+            response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+        }
+
+        if ([200, 201, 204].includes(response.status)) {
+            setStatus(!status);
+            setShowAlert(true);
+        } else {
+            // TODO: Add error handling (alert user that something went wrong)
+            // ...
+        }
+    }
+
+    async function saveRating(newRating) {
+        const data = {gameId: id, rating: newRating};
+        const response = await fetch(`http://localhost:5000/api/collection/${userId}/rating`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data)
         });
 
-        if (response.status === 201) {
-            setStatus(!status);
-            setShowAlert(true);
-            if (!status) {
-                setAlertContent(`Game added to ${category}`);
-            } else {
-                setAlertContent(`Game removed from ${category}`);
-            }
+        console.log(response.status);
+
+        if (response.status === 201 || response.status === 200) {
+            setRating(newRating);
         } else {
             // TODO: Add error handling (alert user that something went wrong)
             // ...
@@ -79,10 +110,10 @@ const StatusContainer = (props) => {
             <div className="flex flex-col items-center">
                 <Rating
                     name="personal-rating"
-                    value={rating ? rating : ""}
+                    value={rating ? rating : 0}
                     precision={0.5}
                     size="large"
-                    onChange={(event, newRating) => setRating(newRating)}
+                    onChange={(event, newRating) => saveRating(newRating)}
                 />
                 <ButtonGroup>
                     <IconButton aria-label="played" onClick={() => toggleStatus(playedStatus, setPlayedStatus, "played")}>
@@ -122,10 +153,6 @@ const GamePage = () => {
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertContent, setAlertContent] = useState("");
-    const [playedStatus, setPlayedStatus] = useState(false);
-    const [playingStatus, setPlayingStatus] = useState(false);
-    const [backlogStatus, setBacklogStatus] = useState(false);
-    const [wishlistStatus, setWishlistStatus] = useState(false);
 
     useEffect(() => {
         async function getGameData() {
@@ -207,14 +234,6 @@ const GamePage = () => {
                     <div id="info-container" className="flex flex-col gap-4">
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-3xl">({gameData.year})</span></h1>
                         <StatusContainer 
-                            playedStatus={playedStatus} 
-                            playingStatus = {playingStatus}
-                            backlogStatus={backlogStatus} 
-                            wishlistStatus={wishlistStatus}
-                            setPlayedStatus={setPlayedStatus}
-                            setPlayingStatus={setPlayingStatus}
-                            setBacklogStatus={setBacklogStatus}
-                            setWishlistStatus={setWishlistStatus}
                             setShowAlert={setShowAlert}
                             setAlertContent={setAlertContent}
                         />
