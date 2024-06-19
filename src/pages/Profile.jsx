@@ -88,45 +88,23 @@ const ShowcaseContent = () => {
 }
 
 const GamesContent = () => {
-  // Temporary data
-  const games = useRef([
-    {
-      gameId: 9927,
-      imageId: "co1r76",
-      title: "Persona 5",
-      userCategory: "played"
-    }, 
-    {
-      gameId: 1942,
-      imageId: "co1wyy",
-      title: "The Witcher 3: Wild Hunt",
-      userCategory: "played"
-    },
-    {
-      gameId: 1009,
-      imageId: "co1r7f",
-      title: "The Last of Us",
-      userCategory: "played"
-    },
-    {
-      gameId: 217590,
-      imageId: "co7lbb",
-      title: "Tekken 8",
-      userCategory: "wishlist"
-    },
-    {
-      gameId: 132181,
-      imageId: "co6bo0",
-      title: "Resident Evil 4",
-      userCategory: "backlog"
-    }
-  ]);
+  const userId = localStorage.getItem("userId");
   const [category, setCategory] = useState("played");
-  const [gamesToDisplay, setGamesToDisplay] = useState(games.current.filter(game => game.userCategory === category));
-  
+  const [gamesToDisplay, setGamesToDisplay] = useState([]);
+
   useEffect(() => {
-    setGamesToDisplay(games.current.filter(game => game.userCategory === category))
-  }, [category])
+    async function GetGames(userId, category) {
+      const response = await fetch(`http://localhost:5000/api/collection/${userId}?status=${category}`);
+      if (response.ok) {
+        const games = await response.json();
+        setGamesToDisplay(games);
+        console.log(gamesToDisplay);
+      }
+    }
+
+    GetGames(userId, category);
+  }, [userId, category]);
+
   return (
     <>
       <div>
@@ -137,7 +115,7 @@ const GamesContent = () => {
             {gamesToDisplay.map(game => {
               return (
                 <>
-                  <GameCard key={game.gameId} gameId={game.gameId} imageId={game.imageId} title={game.title}/>
+                  <GameCard key={game.gameId} gameId={game.gameId} imageId={game.cover} title={game.name}/>
                 </>
               )
             })}
