@@ -77,17 +77,25 @@ router.get("/collection/:userId/game/:gameId", async (req, res) => {
 });
 
 // Remove a game's status from a user's collection
-router.delete("/collection/:userId/game/:gameId", async (req, res) => {
+router.delete("/collection/:userId/game/:gameId/status/:status", async (req, res) => {
   const userId = req.params.userId;
   const gameId = req.params.gameId;
+  const statusToDelete = req.params.status;
   const gameStatus = await UserGameStatus.findOne({userId: userId, gameId: gameId});
 
   if (gameStatus === null) {
     res.status(404).send();
   } else {
-    if (gameStatus.rating !== null) {
+    if (gameStatus.status.length > 1) {
+      // Remove status from list of statuses
+      const index = gameStatus.status.indexOf(statusToDelete);
+      gameStatus.status.splice(index, 1);
+      await gameStatus.save();
+      res.status(200).send();
+    } else if (gameStatus.rating !== null) {
+      // Set status to null (no status associated with game)
       gameStatus.status = null;
-      gameStatus.save();
+      await gameStatus.save();
       res.status(200).send();
     } else {
       // Delete game status from database (no rating or status associated with game for a particular user)
@@ -151,23 +159,17 @@ router.post("/collection/:userId", async (req, res) => {
   // Check if the user already has a status associated with the game
   const existingGameStatus = await UserGameStatus.findOne({userId: userId, gameId: gameId});
 
-  if (status === undefined) {
-    if (rating === null) {
-      // User removed status from game, delete document in UserGameStatus collection
-      await UserGameStatus.deleteOne({userId: userId, gameId: gameId});
-      return res.status(204).send();
-    } else {
-      // User rated the game without choosing a status (set status to played by default)
-      status = "played";
-    }
-  }
-
   if (existingGameStatus === null) {
     const gameStatus = new UserGameStatus({userId, gameId, status, rating});
     await gameStatus.save();
     res.status(201).send();
   } else {
-    existingGameStatus.status = status;
+    console.log("new status");
+    if (existingGameStatus.status === null) {
+      existingGameStatus.status = [status];
+    } else {
+      existingGameStatus.status.push(status);
+    }
     existingGameStatus.rating = rating;
     await existingGameStatus.save();
     res.status(200).send();

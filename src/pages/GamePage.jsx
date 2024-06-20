@@ -25,22 +25,27 @@ const StatusContainer = (props) => {
             console.log("Rerender triggered")
             const response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}`);
             const data = await response.json();
-
-            switch(data.status) {
-                case "playing":
-                    setPlayingStatus(true);
-                    break;
-                case "played":
-                    setPlayedStatus(true);
-                    break;
-                case "backlog":
-                    setBacklogStatus(true);
-                    break;
-                case "wishlist":
-                    setWishlistStatus(true);
-                    break;
-            }
+            const status = data.status;
             setRating(data.rating);
+            if (status === null) {
+                return;
+            }
+            for (const category of status) {
+                switch(category) {
+                    case "playing":
+                        setPlayingStatus(true);
+                        break;
+                    case "played":
+                        setPlayedStatus(true);
+                        break;
+                    case "backlog":
+                        setBacklogStatus(true);
+                        break;
+                    case "wishlist":
+                        setWishlistStatus(true);
+                        break;
+                }
+            }
         }
 
         getUserGameStatus();
@@ -67,7 +72,7 @@ const StatusContainer = (props) => {
             });
         } else {
             setAlertContent(`Game removed from ${category}`);
-            response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}`, {
+            response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}/status/${category}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
