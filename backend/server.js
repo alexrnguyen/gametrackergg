@@ -278,11 +278,6 @@ router.post("/signup", (req, res) => {
   })
 })
 
-router.get("/sign-out", (req, res) => {
-  localStorage.setItem("username", null);
-  res.redirect('/');
-})
-
 app.use("/api/", router);
 
 app.listen(PORT, async () => {

@@ -22,7 +22,9 @@ const StatusContainer = (props) => {
     useEffect(() => {
         async function getUserGameStatus() {
             // Get user's status and rating for the game
-            console.log("Rerender triggered")
+            if (userId === null) {
+                return;
+            }
             const response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}`);
             const data = await response.json();
             const status = data.status;
@@ -111,35 +113,37 @@ const StatusContainer = (props) => {
 
     // TODO: Card width does not account for mobile devices (or any smaller screen)
     return (
-        <Card variant="outlined" className="h-fit">
-            <div className="flex flex-col items-center">
-                <Rating
-                    name="personal-rating"
-                    value={rating ? rating : 0}
-                    precision={0.5}
-                    size="large"
-                    onChange={(event, newRating) => saveRating(newRating)}
-                />
-                <ButtonGroup>
-                    <IconButton aria-label="played" onClick={() => toggleStatus(playedStatus, setPlayedStatus, "played")}>
-                        <SportsEsportsIcon id="played-icon" color={playedStatus ? "success" : "inherit"} />
-                        <p>Played</p>
-                    </IconButton>
-                    <IconButton aria-label="playing" onClick={() => toggleStatus(playingStatus, setPlayingStatus, "playing")}>
-                        <PlayArrow id="playing-icon" color={playingStatus ? "error" : "inherit"} />
-                        <p>Playing</p>
-                    </IconButton>
-                    <IconButton aria-label="backlog" onClick={() => toggleStatus(backlogStatus, setBacklogStatus, "backlog")}>
-                        <QueueIcon id="backlog-icon" color={backlogStatus ? "info" : "inherit"}/>
-                        <p>Backlog</p>
-                    </IconButton>
-                    <IconButton aria-label="wishlist" onClick={() => toggleStatus(wishlistStatus, setWishlistStatus, "wishlist")}>
-                        <CakeIcon id="wishlist-icon" color={wishlistStatus ? "warning" : "inherit"}/>
-                        <p>Wishlist</p>
-                    </IconButton>
-                </ButtonGroup>
-            </div>   
-        </Card>
+        <>
+            {userId ? <Card variant="outlined" className="h-fit">
+                <div className="flex flex-col items-center">
+                    <Rating
+                        name="personal-rating"
+                        value={rating ? rating : 0}
+                        precision={0.5}
+                        size="large"
+                        onChange={(event, newRating) => saveRating(newRating)}
+                    />
+                    <ButtonGroup>
+                        <IconButton aria-label="played" onClick={() => toggleStatus(playedStatus, setPlayedStatus, "played")}>
+                            <SportsEsportsIcon id="played-icon" color={playedStatus ? "success" : "inherit"} />
+                            <p>Played</p>
+                        </IconButton>
+                        <IconButton aria-label="playing" onClick={() => toggleStatus(playingStatus, setPlayingStatus, "playing")}>
+                            <PlayArrow id="playing-icon" color={playingStatus ? "error" : "inherit"} />
+                            <p>Playing</p>
+                        </IconButton>
+                        <IconButton aria-label="backlog" onClick={() => toggleStatus(backlogStatus, setBacklogStatus, "backlog")}>
+                            <QueueIcon id="backlog-icon" color={backlogStatus ? "info" : "inherit"}/>
+                            <p>Backlog</p>
+                        </IconButton>
+                        <IconButton aria-label="wishlist" onClick={() => toggleStatus(wishlistStatus, setWishlistStatus, "wishlist")}>
+                            <CakeIcon id="wishlist-icon" color={wishlistStatus ? "warning" : "inherit"}/>
+                            <p>Wishlist</p>
+                        </IconButton>
+                    </ButtonGroup>
+                </div>   
+            </Card> : <Card variant="outlined" className="h-fit text-center p-4"><a href="/sign-in">Sign in to track, rate, or review</a></Card>}
+        </>
     )
 }
 

@@ -7,6 +7,7 @@ function Navbar() {
   const navigate = useNavigate();
   function handleSignOut() {
     localStorage.removeItem('username');
+    localStorage.removeItem("userId");
     window.location.reload();
   }
   
