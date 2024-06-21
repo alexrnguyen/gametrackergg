@@ -48,19 +48,29 @@ router.get("/games/:id", async (req, res) => {
   res.status(200).json(await response.json());
 });
 
-router.get("/companies/:id", async (req, res) => {
-  // TODO: Change body to use comma separated ids (to retrieve all company names in 1 request)
-  // e.g. ... where id = (1, 2, 3);
+router.get("/companies", async (req, res) => {
+  const companies = req.query.company;
+  const companiesTuple = `(${companies})`;
+
+  if (companies === null) {
+    res.status(400).send({message: "Must include company IDs as query parameters (e.g. 'company=1&company=2&company=3' for companies with IDs 1, 2, and 3)."})
+  }
+
   const url = "https://api.igdb.com/v4/companies/";
   const response = await fetch(url, {
     method: "POST",
     headers: headers,
-    body: `fields name; where id=${req.params.id};`,
+    body: `fields name; where id=${companiesTuple};`,
   });
   const data = await response.json();
-  console.log(data);
-  res.status(200).json({name: data[0].name});
-})
+
+  const companyNames = []
+  for (const company of data) {
+    companyNames.push({name: company.name});
+  }
+
+  res.status(200).json(companyNames);
+});
 
 // Get user's current status and rating for a game
 router.get("/collection/:userId/game/:gameId", async (req, res) => {

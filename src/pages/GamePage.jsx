@@ -179,40 +179,20 @@ const GamePage = () => {
                 }
 
                 // Retrive names of involved companies (developer(s) and publisher(s))
-                const fetchPromises = data[0].involved_companies.map(async (companyJSON) => {
-                    try {
-                      // Fetch data from the URL
-                      const response = await fetch(`http://localhost:5000/api/companies/${companyJSON.company}`);
-                
-                      // Check if the response is ok (status is in the range 200-299)
-                      if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                      }
-                
-                      // Parse the JSON data from the response
-                      const data = await response.json();
-                      
-                      // Return the data
-                      return data;
-                
-                    } catch (error) {
-                      // Handle any errors that occurred during the fetch
-                      console.error(`Failed to fetch data from http://localhost:5000/api/companies/${companyJSON.company}:`, error);
-                      // Return null or some error indicator to handle errors gracefully
-                      return null;
+                if (data[0].involved_companies) {
+                    const companyIDs = data[0].involved_companies.map(companyJSON => companyJSON.company);
+                    const searchParams = new URLSearchParams({ company: companyIDs });
+                    const response = await fetch(`http://localhost:5000/api/companies?${searchParams}`);
+                    const companiesData = await response.json();
+                    
+                    for (let i = 0; i < companiesData.length; i++) {
+                        companiesData[i]["developer"] = data[0].involved_companies[i]["developer"];
+                        companiesData[i]["publisher"] = data[0].involved_companies[i]["publisher"];
                     }
-                });
-                
-                // Wait for all fetch promises to complete
-                const companies = await Promise.all(fetchPromises);
-                
-                for (let i = 0; i < companies.length; i++) {
-                    companies[i]["developer"] = data[0].involved_companies[i]["developer"];
-                    companies[i]["publisher"] = data[0].involved_companies[i]["publisher"];
+                    data = {...data, year, companies: companiesData};
+                } else {
+                    data = {...data, year, companies: []};
                 }
-                
-                data = {...data, year, companies};
-
                 setDataRetrieved(true);
                 return data;
             } else {
