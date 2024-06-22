@@ -40,8 +40,8 @@ const SignUp = () => {
             });
 
             if (response.status === 201) {
-                localStorage.setItem("username", username);
                 const data = await response.json();
+                localStorage.setItem("username", data.username);
                 localStorage.setItem("userId", data.userId);
                 setShowAlert(true);
                 setErrorMessage("");

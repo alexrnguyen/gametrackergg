@@ -242,13 +242,13 @@ const GamePage = () => {
                             })}
                         </div>
                         <div>
-                            <p className="font-bold underline">Developers:</p>
+                            <p className="font-bold underline">Developers</p>
                             {gameData.companies.filter(company => company.developer).map(developer => {
                                 return <p key={developer.name}>{developer.name}</p>
                             })}
                         </div>
                         <div>
-                            <p className="font-bold underline">Publishers:</p>
+                            <p className="font-bold underline">Publishers</p>
                             {gameData.companies.filter(company => company.publisher).map(publisher => {
                                 return <p key={publisher.name}>{publisher.name}</p>
                             })}
