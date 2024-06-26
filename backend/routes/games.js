@@ -33,9 +33,8 @@ router.get("/:id", async (req, res) => {
 router.get("/:id/ratings", async (req, res) => {
   const gameId = req.params.id;
   const gameRatingsData = await UserGameStatus.find({gameId: gameId, 'rating': {$ne : null}}).select("-_id rating");
-
-  if (gameRatingsData === null) {
-    res.status(404).send("No ratings found");
+  if (gameRatingsData.length === 0) {
+    return res.status(404).send("No ratings found");
   }
   const ratings = gameRatingsData.map(data => data.rating);
 
