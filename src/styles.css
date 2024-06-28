@@ -5,3 +5,7 @@
 :root {
   --grey: #555;
 }
+
+.MuiChartsAxis-directionY  {
+  visibility: hidden;
+}
