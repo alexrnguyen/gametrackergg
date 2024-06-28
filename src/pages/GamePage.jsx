@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ButtonGroup, IconButton, CircularProgress, Card, Rating, Alert } from "@mui/material";
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
@@ -6,6 +6,7 @@ import QueueIcon from '@mui/icons-material/Queue';
 import CakeIcon from '@mui/icons-material/Cake';
 import { PlayArrow } from "@mui/icons-material";
 import ScreenshotCarousel from "../components/ScreenshotCarousel";
+import RatingDistribution from "../components/RatingDistribution";
 
 
 const StatusContainer = (props) => {
@@ -157,6 +158,9 @@ const GamePage = () => {
         year: null,
         screenshots: []
     });
+
+    const averageRating = useRef('N/A');
+    const ratings = useRef([]);
     const [dataRetrieved, setDataRetrieved] = useState(false);
     const {id} = useParams();
 
@@ -166,7 +170,7 @@ const GamePage = () => {
     useEffect(() => {
         async function getGameData() {
             const gameResponse = await fetch(`http://localhost:5000/api/games/${id}`);
-            if (gameResponse.status === 200) {
+            if (gameResponse.ok) {
                 let data = await gameResponse.json();
                 console.log(data);
 
@@ -193,8 +197,19 @@ const GamePage = () => {
                 } else {
                     data = {...data, year, companies: []};
                 }
-                setDataRetrieved(true);
                 return data;
+            } else {
+                return null;
+            }
+        }
+
+        async function getRatings() {
+            const ratingsResponse = await fetch(`http://localhost:5000/api/games/${id}/ratings`);
+            if (ratingsResponse.ok) {
+                const data = await ratingsResponse.json();
+                averageRating.current = data.averageRating;
+                ratings.current = data.ratings;
+                console.log(ratings.current);
             } else {
                 return null;
             }
@@ -203,6 +218,8 @@ const GamePage = () => {
         const fetchData = async () => {
             const queriedData = await getGameData();
             setGameData(queriedData);
+            await getRatings();
+            setDataRetrieved(true);
         }
         fetchData();
     }, [id]);
@@ -222,10 +239,16 @@ const GamePage = () => {
                     <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData[0].cover ? gameData[0].cover.image_id : null}.png`} alt="" />
                     <div id="info-container" className="flex flex-col gap-4">
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-3xl">({gameData.year})</span></h1>
-                        <StatusContainer 
-                            setShowAlert={setShowAlert}
-                            setAlertContent={setAlertContent}
-                        />
+                        <div className="flex gap-4">
+                            <StatusContainer 
+                                setShowAlert={setShowAlert}
+                                setAlertContent={setAlertContent}
+                            />
+                            <div>
+                                <p className="text-xl pl-12">Average Rating: <span className="font-bold">{averageRating.current}</span></p>
+                                <RatingDistribution ratings={ratings.current}/>
+                            </div>
+                        </div>
                         <p>{gameData[0].summary || "No description available"}</p>
                     </div>
                     <div className="justify-self-center flex flex-col gap-4">
