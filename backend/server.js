@@ -1,7 +1,6 @@
 // Referenced: https://www.youtube.com/watch?v=5CFafWpWwxo&t=694s
 
 const express = require("express");
-const router = express.Router();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -15,6 +14,7 @@ const companies = require("./routes/companies.js");
 const games = require("./routes/games.js");
 const signin = require("./routes/signin.js");
 const signup = require("./routes/signup.js");
+const users = require("./routes/users.js");
 
 // Create Express app
 const app = express();
@@ -28,6 +28,7 @@ app.use("/api/companies", companies);
 app.use("/api/games", games);
 app.use("/api/signin", signin);
 app.use("/api/signup", signup);
+app.use("/api/users", users);
 
 app.listen(PORT, async () => {
   console.log(`Listening on port ${PORT}`);
