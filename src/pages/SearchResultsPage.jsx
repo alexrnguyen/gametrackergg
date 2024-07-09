@@ -4,7 +4,7 @@ import GameCard from "../components/GameCard";
 import { CircularProgress } from "@mui/material";
 import Pagination from '@mui/material/Pagination';
 
-const SearchResults = () => {
+const SearchResultsPage = () => {
     const [results, setResults] = useState([]);
     const [numResults, setNumResults] = useState(0);
     const [searchParams] = useSearchParams();
@@ -58,4 +58,4 @@ const SearchResults = () => {
     )
 }
 
-export default SearchResults;
+export default SearchResultsPage;

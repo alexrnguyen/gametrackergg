@@ -4,7 +4,7 @@ import MyGames from "./pages/MyGames";
 import Profile from "./pages/Profile";
 import Navbar from './components/Navbar'
 import { Route, Routes } from 'react-router-dom'
-import SearchResults from './pages/SearchResults'
+import SearchResultsPage from './pages/SearchResultsPage'
 import GamePage from './pages/GamePage';
 import Footer from './components/Footer';
 import SignIn from './pages/SignIn';
@@ -24,7 +24,7 @@ function App() {
           <Route path="profile" element={<Profile />}/>
           <Route path='following/:uid' element={<Following />}/>
           <Route path='followers/:uid' element={<Followers />}/>
-          <Route path='search-results' element={<SearchResults route={{input: ""}}/>}/>
+          <Route path='search-results' element={<SearchResultsPage route={{input: ""}}/>}/>
           <Route path='game/:id' element={<GamePage/>}/>
           <Route path='sign-in' element={<SignIn/>}/>
           <Route path='sign-up' element={<SignUp/>}/>
