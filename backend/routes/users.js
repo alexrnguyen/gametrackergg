@@ -3,7 +3,8 @@ const router = express.Router();
 
 // MongoDB Models
 const User = require("../models/User.js");
-const Game = require("../models/Game.js");
+
+const FAVOURITE_GAMES_LIMIT = 4;
 
 // Get user details
 router.get("/:id", async (req, res) => {
@@ -15,6 +16,20 @@ router.get("/:id", async (req, res) => {
     }
 
     res.status(200).send({username: user.username, favouriteGames: user.favourite_games, following: user.following, followers: user.followers});
+});
+
+// Get user's favourite games
+router.get("/:id/favourites", async (req, res) => {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId);
+
+    // Verify that user exists
+    if (user === null) {
+        return res.status(404).send("User not found");
+    }
+
+    res.status(200).send(user.favourite_games);
 });
 
 // Add game to favourite games
@@ -32,6 +47,11 @@ router.post("/:id/favourites", async (req, res) => {
     // Check if game is already in favourites
     if (user.favourite_games.includes(gameId)) {
         return res.status(400).send("Game already in favourites");
+    }
+
+    // Prevent users from adding more than 4 favourite games
+    if (user.favourite_games.length >= 4) {
+        return res.status(400).send("Can only have at most 4 games marked as favourites");
     }
 
     user.favourite_games.push(gameId);

@@ -1,9 +1,10 @@
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { ToggleButton, ToggleButtonGroup, CircularProgress } from "@mui/material";
 import PropTypes from 'prop-types';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import GameCard from "../components/GameCard";
 import ProfilePic from "../assets/test-profile-pic.jpg"
 import CategoryContainer from "../components/CategoryContainer";
+import AddGameCard from "../components/AddGameCard";
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -40,41 +41,44 @@ const ProfileNavbar = ({section, setSection}) => {
 }
 
 const ShowcaseContent = () => {
+  const userId = localStorage.getItem("userId");
+  const [favouriteGames, setFavouriteGames] = useState([]);
 
-  // Temporary
-  const favouriteGames = useRef([
-    {
-      gameId: 9927,
-      imageId: "co1r76",
-      title: "Persona 5",
-    }, 
-    {
-      gameId: 1942,
-      imageId: "co1wyy",
-      title: "The Witcher 3: Wild Hunt",
-    },
-    {
-      gameId: 1009,
-      imageId: "co1r7f",
-      title: "The Last of Us",
-    },
-    {
-      gameId: 7331,
-      imageId: "co1r7h",
-      title: "Uncharted 4: A Thief's End"
+  useEffect(() => {
+    async function getFavouriteGames() {
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/favourites`);
+
+      if (response.ok) {
+        const favouriteGameIds = await response.json();
+        const promises = [];
+        Array.from(favouriteGameIds).forEach(id => {
+          const promise = fetch(`http://localhost:5000/api/games/${id}`);
+          promises.push(promise);
+        });
+        const games = await Promise.all(promises).then(async (res) => {
+          return Promise.all(
+            // Data contains an array with a single object. Add the object to favourite games
+            res.map(async (data) => (await data.json())[0])
+          )
+        });
+        setFavouriteGames(games);
+      }
     }
-  ]);
+
+    getFavouriteGames();
+  }, [userId]);
 
   return (
     <div className="flex gap-8">
       <div id="favourite-games" className="">
         <h2 className="text-xl">Favourite Games</h2>
         <ul className='flex gap-4'>
-          {favouriteGames.current.map(game => {
+          {favouriteGames.map(game => {
               return (
-                  <GameCard key={game.gameId} gameId={game.gameId} imageId={game.imageId} title={game.title}/>
+                  <GameCard key={game.id} gameId={game.id} imageId={game.cover.image_id} title={game.name}/>
               )
           })}
+          {favouriteGames.length < 4 ? <AddGameCard /> : null}
         </ul>
       </div>
       <div id="reviews">
@@ -93,7 +97,7 @@ const GamesContent = () => {
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
 
   useEffect(() => {
-    async function GetGames(userId, category) {
+    async function getGames(userId, category) {
       const response = await fetch(`http://localhost:5000/api/collection/${userId}?status=${category}`);
       if (response.ok) {
         const games = await response.json();
@@ -102,7 +106,7 @@ const GamesContent = () => {
       }
     }
 
-    GetGames(userId, category);
+    getGames(userId, category);
   }, [userId, category]);
 
   return (
@@ -128,36 +132,57 @@ const GamesContent = () => {
 }
 
 const Profile = () => {
+  const userId = localStorage.getItem("userId");
   const [section, setSection] = useState("showcase");
+  const [user, setUser] = useState({});
+  const [dataRetrieved, setDataRetrieved] = useState(false);
+
+  useEffect(() => {
+    async function getUser(userId) {
+      const response = await fetch(`http://localhost:5000/api/users/${userId}`);
+      console.log(response.status);
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        setDataRetrieved(true);
+      }
+    }
+
+    getUser(userId);
+  }, [userId]);
 
   return (
-    <div className="p-4">
-      <header id="profile-header" className="mb-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="rounded-full w-24 h-24 border-black border-2 overflow-hidden">
-              <img src={ProfilePic} alt="Profile Picture" />
+    <>
+    {dataRetrieved ? 
+        <div className="p-4">
+          <header id="profile-header" className="mb-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full w-24 h-24 border-black border-2 overflow-hidden">
+                  <img src={ProfilePic} alt="Profile Picture" />
+                </div>
+                <span className="text-2xl" id="profile-username">{user.username}</span>
+              </div>
+              <StatsContainer/>
+              <div className="flex gap-4">
+                <a className="flex flex-col items-center" href={`/following/${userId}`}>
+                  <h4>Following</h4>
+                  <span id="following" className="font-bold">{user.following.length}</span>
+                </a>
+                <a className="flex flex-col items-center" href={`/followers/${userId}`}>
+                  <h4>Followers</h4>
+                  <span id="followers" className="font-bold">{user.followers.length}</span>
+                </a>
+              </div>
             </div>
-            <span className="text-2xl" id="profile-username">PieceOfPi</span>
-          </div>
-          <StatsContainer/>
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center">
-              <h4>Following</h4>
-              <span id="following" className="font-bold">13</span>
+            <div className="flex justify-center">
+              <ProfileNavbar section={section} setSection={setSection}/>
             </div>
-            <div className="flex flex-col items-center">
-              <h4>Followers</h4>
-              <span id="followers" className="font-bold">13</span>
-            </div>
-          </div>
+          </header>
+          {section === "showcase" ? <ShowcaseContent /> : <GamesContent />}
         </div>
-        <div className="flex justify-center">
-          <ProfileNavbar section={section} setSection={setSection}/>
-        </div>
-      </header>
-      {section === "showcase" ? <ShowcaseContent /> : <GamesContent />}
-    </div>
+    : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}
+    </>
   );
 };
 
