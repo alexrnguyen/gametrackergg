@@ -9,3 +9,19 @@
 .MuiChartsAxis-directionY  {
   visibility: hidden;
 }
+
+.game-card-title {
+  width: fit-content;
+  overflow-x: visible;
+  white-space: nowrap;
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: small;
+  text-align: center;
+  background-color: black;
+  padding: 5px 10px 5px 10px;
+  border-radius: 5px;
+  color: white;
+}
