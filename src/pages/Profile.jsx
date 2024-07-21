@@ -5,6 +5,7 @@ import GameCard from "../components/GameCard";
 import ProfilePic from "../assets/test-profile-pic.jpg"
 import CategoryContainer from "../components/CategoryContainer";
 import AddGameCard from "../components/AddGameCard";
+import { TiDelete } from "react-icons/ti";
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -68,6 +69,22 @@ const ShowcaseContent = () => {
     getFavouriteGames();
   }, [userId]);
 
+  async function removeFavouriteGame(gameId) {
+    const response = await fetch(`http://localhost:5000/api/users/${userId}/favourites/${gameId}`, {
+      method: "DELETE",
+    });
+
+    if (response.status === 204) {
+      window.location.reload();
+      /* const indexOfRemovedGame = favouriteGames.indexOf(gameId);
+      const newFavouriteGames = favouriteGames.filter((_, i) => i !== indexOfRemovedGame);
+      setFavouriteGames([...newFavouriteGames]); */
+    } else {
+      // TODO: Handle case where game could not be removed
+      // ...
+    }
+  }
+
   return (
     <div className="flex gap-8">
       <div id="favourite-games" className="">
@@ -75,7 +92,12 @@ const ShowcaseContent = () => {
         <ul className='flex gap-4'>
           {favouriteGames.map(game => {
               return (
-                  <GameCard key={game.id} gameId={game.id} imageId={game.cover.image_id} title={game.name}/>
+                <div className="relative" key={game.id}>
+                  <GameCard gameId={game.id} imageId={game.cover ? game.cover.image_id : null} title={game.name}/>
+                  <div className="cursor-pointer absolute top-0 right-0">
+                    <TiDelete style={{width: "30", height: "30", color: "red"}} onClick={() => removeFavouriteGame(game.id)} />
+                  </div>
+                </div>
               )
           })}
           {favouriteGames.length < 4 ? <AddGameCard /> : null}
@@ -118,9 +140,7 @@ const GamesContent = () => {
           <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
             {gamesToDisplay.map(game => {
               return (
-                <>
-                  <GameCard key={game.gameId} gameId={game.gameId} imageId={game.cover} title={game.name}/>
-                </>
+                 <GameCard key={game.gameId} gameId={game.gameId} imageId={game.cover} title={game.name}/>
               )
             })}
           </ul>

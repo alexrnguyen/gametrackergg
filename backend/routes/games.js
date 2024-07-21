@@ -12,11 +12,10 @@ router.get("/", async (req, res) => {
     const page = req.query.page;
     const url = "https://api.igdb.com/v4/games/";
 
-    console.log(`fields name, cover.*; search "${searchInput}"; limit ${resultLimit}; offset ${page ? (page-1)*resultLimit : 0}`);
     const response = await fetch(url, {
       method: "POST",
       headers: headers,
-      body: `fields name, cover.*; search "${searchInput}"; limit ${resultLimit}; offset ${(page-1)*resultLimit};`,
+      body: `fields name, cover.*, release_dates.*, platforms.*; search "${searchInput}"; limit ${resultLimit}; offset ${(page-1)*resultLimit};`,
     });
 
     const games = await response.json();

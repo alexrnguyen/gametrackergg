@@ -19,7 +19,8 @@ const AddGameCard = () => {
     }
 
     async function handleOnChange(e) {
-        setSearchInput(e.target.value)
+        const input = e.target.value;
+        setSearchInput(input);
 
         // Abort previous search request
         if (controllerRef.current) {
@@ -29,11 +30,11 @@ const AddGameCard = () => {
         const signal = controllerRef.current.signal;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/games?searchInput=${searchInput}&page=1`, {signal: signal});
+            const response = await fetch(`http://localhost:5000/api/games?searchInput=${input}&page=1`, {signal: signal});
             const data = await response.json();
             const games = data.games;
+            console.log(games);
             setSearchResults(games);
-            console.log(searchResults);
         } catch (e) {
             // TODO: Handle errors
             // ...
@@ -51,8 +52,9 @@ const AddGameCard = () => {
         });
 
         if (response.ok) {
-            // Display alert on profile page
-
+            // TODO: Display alert on profile page
+            setShowModal(false);
+            window.location.reload();
         } else if (response.status === 400) {
             // Invalid game ID in request body
             // ...
