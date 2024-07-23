@@ -7,10 +7,10 @@ export default function RatingDistribution({ ratings }) {
         <>
             <BarChart 
                 dataset={ratings}
-                xAxis={[{ scaleType: 'band', dataKey: 'rating', data: ['½', '★', '★½', '★★', '★★½', '★★★', '★★★½', '★★★★', '★★★★½', '★★★★★']}]}
+                xAxis={[{ scaleType: 'band', dataKey: 'rating', data: ['½', '★', '★½', '★★', '★★½', '★★★', '★★★½', '★★★★', '★★★★½', '★★★★★'], tickLabelInterval: (_, index) => index === 0 || index === 9}]}
                 yAxis={[{scaleType: undefined, disableLine: true, disableTicks: true, label: undefined}]}
                 series={[{dataKey: 'numRatings'}]}
-                width={750}
+                width={300}
                 height={150}
             />
         </>
