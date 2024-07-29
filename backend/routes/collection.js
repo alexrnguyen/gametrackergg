@@ -49,23 +49,39 @@ router.delete("/:userId/game/:gameId/status/:status", async (req, res) => {
     }
 });
   
-// Get all games in a user's collection (can filter by status)
+// Get all games in a user's collection (can filter by status), sort results if necessary
 router.get("/:userId", async (req, res) => {
     // Filter games by status if specified in query parameters
     const userId = req.params.userId;
     const status = req.query.status;
+    const sortCriterion = req.query.sortBy;
     let documents;
-  
-    if (status === undefined) {
-      // Get all games in a user's collection
-      documents = await UserGameStatus.find({userId: userId}).sort({rating: -1});
-  
-    } else {
-      // Get all games with a specific status in a user's collection
-      if (status !== "playing" && status !== "played" && status !== "backlog" && status !== "wishlist") {
-        return res.status(400).send({message: "Status query parameter must be one of the following: playing, played, backlog, wishlist."});
+
+    // Get all games with a specific status in a user's collection
+    if (status !== "playing" && status !== "played" && status !== "backlog" && status !== "wishlist" && status !== undefined) {
+      return res.status(400).send({message: "Status query parameter must be one of the following: playing, played, backlog, wishlist."});
+    }
+
+    if (sortCriterion) {
+      switch (sortCriterion) {
+        case "date":
+          // sort by date added to user's collection
+          documents = await UserGameStatus.find({userId: userId, status: status ? status : 1}).sort({'dateAdded': -1});
+          break;
+        case "rating":
+          // sort by user rating
+          documents = await UserGameStatus.find({userId: userId, status: status ? status : 1}).sort({'rating': -1});
+          break;
+        default: {
+          // sort by name (alphabetical)
+          const gameStatuses = await UserGameStatus.find({userId: userId, status: status ? status : 1});
+          const gameIds = gameStatuses.map(status => status.gameId || null);
+          const games = await Game.find({gameId: { "$in": gameIds} }).sort("name");
+          return res.status(200).send(games);
+        }
       }
-      documents = await UserGameStatus.find({userId: userId, status: status}).sort({rating: -1});
+    } else {
+      documents = await UserGameStatus.find({userId: userId, status: status ? status : 1})
     }
   
     const queries = [];
@@ -83,6 +99,7 @@ router.post("/:userId", async (req, res) => {
     const gameId = req.body.gameId;
     let status = req.body.status;
     const rating = req.body.rating; // possibly null
+    const dateAdded = new Date();
   
     const game = await Game.findOne({gameId: gameId});
   
@@ -104,11 +121,10 @@ router.post("/:userId", async (req, res) => {
     const existingGameStatus = await UserGameStatus.findOne({userId: userId, gameId: gameId});
   
     if (existingGameStatus === null) {
-      const gameStatus = new UserGameStatus({userId, gameId, status, rating});
+      const gameStatus = new UserGameStatus({userId, gameId, status, rating, dateAdded});
       await gameStatus.save();
       res.status(201).send();
     } else {
-      console.log("new status");
       if (existingGameStatus.status === null) {
         existingGameStatus.status = [status];
       } else {

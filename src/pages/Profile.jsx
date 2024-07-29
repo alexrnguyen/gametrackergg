@@ -6,6 +6,7 @@ import ProfilePic from "../assets/test-profile-pic.jpg"
 import CategoryContainer from "../components/CategoryContainer";
 import AddGameCard from "../components/AddGameCard";
 import { TiDelete } from "react-icons/ti";
+import SortSelector from "../components/SortSelector";
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -117,10 +118,11 @@ const GamesContent = () => {
   const userId = localStorage.getItem("userId");
   const [category, setCategory] = useState("played");
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
+  const [sortCriterion, setSortCriterion] = useState("date");
 
   useEffect(() => {
     async function getGames(userId, category) {
-      const response = await fetch(`http://localhost:5000/api/collection/${userId}?status=${category}`);
+      const response = await fetch(`http://localhost:5000/api/collection/${userId}?status=${category}&sortBy=${sortCriterion}`);
       if (response.ok) {
         const games = await response.json();
         setGamesToDisplay(games);
@@ -129,13 +131,21 @@ const GamesContent = () => {
     }
 
     getGames(userId, category);
-  }, [userId, category]);
+  }, [userId, category, sortCriterion]);
+
+  function handleCriterionChange(event) {
+    setSortCriterion(event.target.value);
+    console.log(event.target.value);
+  }
 
   return (
     <>
       <div>
         <div className="flex flex-col justify-center">
-          <CategoryContainer category={category} setCategory={setCategory}/>
+          <div className="flex justify-between">
+            <CategoryContainer category={category} setCategory={setCategory}/>
+            <SortSelector defaultValue={sortCriterion} onChange={handleCriterionChange}/>
+          </div>
           {gamesToDisplay.length === 0 && "No Games"}
           <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
             {gamesToDisplay.map(game => {
