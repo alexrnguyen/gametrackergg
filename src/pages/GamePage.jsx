@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ButtonGroup, IconButton, CircularProgress, Card, Rating, Alert } from "@mui/material";
+import { ButtonGroup, IconButton, CircularProgress, Card, Rating, Alert, Button } from "@mui/material";
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import QueueIcon from '@mui/icons-material/Queue';
 import CakeIcon from '@mui/icons-material/Cake';
 import { PlayArrow } from "@mui/icons-material";
 import ScreenshotCarousel from "../components/ScreenshotCarousel";
 import RatingDistribution from "../components/RatingDistribution";
+import ReviewModal from "../components/ReviewModal";
 
 
 const StatusContainer = (props) => {
@@ -17,6 +18,8 @@ const StatusContainer = (props) => {
     const [backlogStatus, setBacklogStatus] = useState(false);
     const [wishlistStatus, setWishlistStatus] = useState(false);
     const [rating, setRating] = useState(0);
+    const [showModal, setShowModal] = useState(false);
+
     const {id} = useParams();
     const userId = localStorage.getItem("userId");
 
@@ -117,13 +120,16 @@ const StatusContainer = (props) => {
         <>
             {userId ? <Card variant="outlined" className="h-fit">
                 <div className="flex flex-col items-center">
-                    <Rating
-                        name="personal-rating"
-                        value={rating ? rating : 0}
-                        precision={0.5}
-                        size="large"
-                        onChange={(event, newRating) => saveRating(newRating)}
-                    />
+                    <div className="flex justify-evenly w-full">
+                        <Rating
+                            name="personal-rating"
+                            value={rating ? rating : 0}
+                            precision={0.5}
+                            size="large"
+                            onChange={(_, newRating) => saveRating(newRating)}
+                        />
+                        <Button className="" variant="outlined" onClick={() => setShowModal(true)}>Add Review</Button>
+                    </div>
                     <ButtonGroup>
                         <IconButton aria-label="played" onClick={() => toggleStatus(playedStatus, setPlayedStatus, "played")}>
                             <SportsEsportsIcon id="played-icon" color={playedStatus ? "success" : "inherit"} />
@@ -142,6 +148,7 @@ const StatusContainer = (props) => {
                             <p>Wishlist</p>
                         </IconButton>
                     </ButtonGroup>
+                    <ReviewModal open={showModal} onClose={() => setShowModal(false)}/>
                 </div>   
             </Card> : <Card variant="outlined" className="h-fit text-center p-4"><a href="/sign-in">Sign in to track, rate, or review</a></Card>}
         </>
@@ -239,15 +246,13 @@ const GamePage = () => {
                     <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData[0].cover ? gameData[0].cover.image_id : null}.png`} alt="" />
                     <div id="info-container" className="flex flex-col gap-4">
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-3xl">({gameData.year})</span></h1>
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 items-center">
                             <StatusContainer 
                                 setShowAlert={setShowAlert}
                                 setAlertContent={setAlertContent}
                             />
-                            <div>
-                                <p className="text-xl pl-12">Average Rating: <span className="font-bold">{averageRating.current}</span></p>
-                                <RatingDistribution ratings={ratings.current}/>
-                            </div>
+                            <p className="text-xl pl-12">Average Rating: <span className="font-bold">{averageRating.current}</span></p>
+                            <RatingDistribution ratings={ratings.current}/>
                         </div>
                         <p>{gameData[0].summary || "No description available"}</p>
                     </div>
