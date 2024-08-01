@@ -7,6 +7,7 @@ import CategoryContainer from "../components/CategoryContainer";
 import AddGameCard from "../components/AddGameCard";
 import { TiDelete } from "react-icons/ti";
 import SortSelector from "../components/SortSelector";
+import ReviewCard from "../components/ReviewCard";
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -37,6 +38,9 @@ const ProfileNavbar = ({section, setSection}) => {
           </ToggleButton>
           <ToggleButton value="games" className="bg-opacity-0" size="small">
             Games
+          </ToggleButton>
+          <ToggleButton value="reviews" className="bg-opacity-0" size="small">
+            Reviews
           </ToggleButton>
     </ToggleButtonGroup>
   )
@@ -77,9 +81,6 @@ const ShowcaseContent = () => {
 
     if (response.status === 204) {
       window.location.reload();
-      /* const indexOfRemovedGame = favouriteGames.indexOf(gameId);
-      const newFavouriteGames = favouriteGames.filter((_, i) => i !== indexOfRemovedGame);
-      setFavouriteGames([...newFavouriteGames]); */
     } else {
       // TODO: Handle case where game could not be removed
       // ...
@@ -126,7 +127,6 @@ const GamesContent = () => {
       if (response.ok) {
         const games = await response.json();
         setGamesToDisplay(games);
-        console.log(gamesToDisplay);
       }
     }
 
@@ -147,7 +147,7 @@ const GamesContent = () => {
             <SortSelector defaultValue={sortCriterion} onChange={handleCriterionChange}/>
           </div>
           {gamesToDisplay.length === 0 && "No Games"}
-          <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
+          <ul className="grid grid-cols-4 lg:grid-cols-8 place-items-center gap-4 py-2">
             {gamesToDisplay.map(game => {
               return (
                  <GameCard key={game.gameId} gameId={game.gameId} imageId={game.cover} title={game.name}/>
@@ -155,6 +155,37 @@ const GamesContent = () => {
             })}
           </ul>
         </div>
+      </div>
+    </>
+  )
+
+}
+
+const ReviewsContent = ({user}) => {
+  const userId = localStorage.getItem("userId");
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    async function getUserReviews(userId) {
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/reviews`);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setReviews(data);
+      }
+    }
+
+    getUserReviews(userId);
+  }, [userId]);
+
+  return (
+    <>
+      <h2 className="text-2xl">Reviews</h2>
+      <div className="flex flex-col gap-8">
+        {reviews.map(review => {
+          return <ReviewCard key={review._id} id={review._id} game={review.game} text={review.text} user={user} />
+        })}
       </div>
     </>
   )
@@ -170,7 +201,6 @@ const Profile = () => {
   useEffect(() => {
     async function getUser(userId) {
       const response = await fetch(`http://localhost:5000/api/users/${userId}`);
-      console.log(response.status);
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
@@ -209,7 +239,7 @@ const Profile = () => {
               <ProfileNavbar section={section} setSection={setSection}/>
             </div>
           </header>
-          {section === "showcase" ? <ShowcaseContent /> : <GamesContent />}
+          {section === "showcase" ? <ShowcaseContent /> : (section === "games" ? <GamesContent /> : <ReviewsContent user={user} />)}
         </div>
     : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}
     </>
