@@ -1,13 +1,13 @@
-import { Link, useMatch, useNavigate, useResolvedPath } from "react-router-dom";
+import { Link, useMatch, useResolvedPath } from "react-router-dom";
 import Searchbar from "./Searchbar";
 import { useEffect, useState } from "react";
 
 function Navbar() {
   const [signedIn, setSignedIn] = useState(!!localStorage.getItem('username'));
-  const navigate = useNavigate();
   function handleSignOut() {
     localStorage.removeItem('username');
     localStorage.removeItem("userId");
+    window.location.href('');
     window.location.reload();
   }
   
@@ -24,12 +24,12 @@ function Navbar() {
   }, []);
   
   return (
-    <nav className="bg-black text-white flex justify-between items-center gap-2 px-4 py-2">
-      <div className="flex items-center gap-4 w-1/2">
-        <Link className='text-xl' to="/">GameTracker.gg</Link>
+    <nav className="bg-black text-white flex justify-between items-center gap-2 px-16 py-2">
+      <div className="flex items-center gap-4">
+        <Link className='text-lg md:text-xl' to="/">GameTracker.gg</Link>
         <Searchbar></Searchbar>
       </div>
-      <ul className="flex justify-end gap-4 w-1/2">
+      <ul className="flex justify-end gap-4 flex-grow">
         {signedIn ? (
           <>
             <CustomLink to="/my-games">My Games</CustomLink>

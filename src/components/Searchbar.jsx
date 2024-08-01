@@ -18,7 +18,7 @@ const Searchbar = () => {
   };
   return (
       <input
-        className="bg-grey w-full text-white px-1"
+        className="bg-grey w-full text-white px-1 flex-grow"
         type="text"
         placeholder="Search a game"
         onChange={handleChange}
