@@ -1,10 +1,13 @@
 const express = require("express");
+const getUsers = require("../utils/getUsers.js");
+const getGames = require("../utils/getGames.js");
 const router = express.Router();
 const headers = require("../headers");
 const resultLimit = 48;
 
 // MongoDB Models
 const UserGameStatus = require("../models/UserGameStatus.js");
+const Review = require("../models/Review.js");
 
 // Search for games based on search input query parameter
 router.get("/", async (req, res) => {
@@ -68,6 +71,36 @@ router.get("/:id/ratings", async (req, res) => {
   }
 
   res.status(200).send({averageRating: averageRating, ratings: ratingsDataset});
+});
+
+// Get all reviews for a game
+router.get("/:id/reviews", async (req, res) => {
+  // TODO: Add page and size parameters to this endpoint
+  const gameId = req.params.id;
+
+  const reviewsData = await Review.find({'gameId': gameId});
+  const reviews = reviewsData.map(reviewData => reviewData.toObject());
+
+  if (reviews.length === 0) {
+    return res.status(404).send(`No reviews found for game with id ${gameId}`);
+  }
+
+  // Get user documents from user IDs
+  const userIds = reviews.map(review => review.userId);
+  const users = await getUsers(userIds);
+
+  for (let i = 0; i < reviews.length; i++) {
+    reviews[i] = {...reviews[i], user: users[i]};
+  }
+
+  // Get game details for each review
+  const gameIds = reviews.map(review => review.gameId);
+  const games = await getGames(gameIds);
+
+  for (let i = 0; i < reviews.length; i++) {
+      reviews[i] = {...reviews[i], game: games[i]};
+  }
+  res.status(200).send(reviews);
 });
 
 module.exports = router;

@@ -1,4 +1,6 @@
 const express = require("express");
+const getUsers = require("../utils/getUsers.js");
+const getGames = require("../utils/getGames.js");
 const router = express.Router();
 
 // MongoDB Models
@@ -7,23 +9,6 @@ const Review = require("../models/Review.js");
 
 const FAVOURITE_GAMES_LIMIT = 4;
 
-// Convert user IDs to User objects
-async function getUsers(userIds) {
-    if (userIds.length === 0) {
-        return [];
-    }
-
-    const promises = [];
-    for (const userId of userIds) {
-        const promise = User.findById(userId);
-        promises.push(promise);
-    }
-
-    const users = await Promise.all(promises);
-
-    // Get rid of null user objects (users who were not found in the database)
-    return users.filter(user => user !== null);
-}
 
 // Get user details
 router.get("/:id", async (req, res) => {
@@ -34,11 +19,12 @@ router.get("/:id", async (req, res) => {
         return res.status(404).send("User not found");
     }
 
-    res.status(200).send({id: user._id, username: user.username, favouriteGames: user.favourite_games, following: user.following, followers: user.followers});
+    res.status(200).send({_id: user._id, username: user.username, favouriteGames: user.favourite_games, following: user.following, followers: user.followers});
 });
 
 // Get all user reviews
 router.get("/:id/reviews", async (req, res) => {
+    // TODO: Add page and size parameters to this endpoint
     const userId = req.params.id;
 
     const user = await User.findById(userId);
@@ -51,23 +37,9 @@ router.get("/:id/reviews", async (req, res) => {
     const reviewsData = await Review.find({'userId': userId});
     const reviews = reviewsData.map(reviewData => reviewData.toObject());
 
-    // TODO: Get game details for each review
-    const promises = [];
-    const url = "https://api.igdb.com/v4/games/";
-    const headers = require("../headers");
-    for (const review of reviews) {
-        const promise = fetch(url, {
-            method: "POST",
-            headers: headers,
-            body: `fields name, cover.*, release_dates.*, platforms.*; where id=${review.gameId};`,
-        });
-
-        promises.push(promise);
-    }
-
-    const responses = await Promise.all(promises);
-    const data = await Promise.all(responses.map(response => response.json()));
-    const games = data.flat();
+    // Get game details for each review
+    const gameIds = reviews.map(review => review.gameId);
+    const games = await getGames(gameIds);
 
     for (let i = 0; i < reviews.length; i++) {
         reviews[i] = {...reviews[i], game: games[i]};
