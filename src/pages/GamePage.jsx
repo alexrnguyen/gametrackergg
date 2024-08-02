@@ -8,6 +8,7 @@ import { PlayArrow } from "@mui/icons-material";
 import ScreenshotCarousel from "../components/ScreenshotCarousel";
 import RatingDistribution from "../components/RatingDistribution";
 import ReviewModal from "../components/ReviewModal";
+import ReviewCard from "../components/ReviewCard";
 
 
 const StatusContainer = (props) => {
@@ -156,6 +157,8 @@ const StatusContainer = (props) => {
 }
 
 const GamePage = () => {
+    const { id } = useParams();
+
     const [gameData, setGameData] = useState({
         0: {
             name: null,
@@ -168,9 +171,8 @@ const GamePage = () => {
 
     const averageRating = useRef('N/A');
     const ratings = useRef([]);
+    const [reviews, setReviews] = useState([]); 
     const [dataRetrieved, setDataRetrieved] = useState(false);
-    const {id} = useParams();
-
     const [showAlert, setShowAlert] = useState(false);
     const [alertContent, setAlertContent] = useState("");
 
@@ -216,7 +218,16 @@ const GamePage = () => {
                 const data = await ratingsResponse.json();
                 averageRating.current = data.averageRating;
                 ratings.current = data.ratings;
-                console.log(ratings.current);
+            } else {
+                return null;
+            }
+        }
+
+        async function getReviews() {
+            const reviewsResponse = await fetch(`http://localhost:5000/api/games/${id}/reviews`);
+            if (reviewsResponse.ok) {
+                const data = await reviewsResponse.json();
+                setReviews(data);
             } else {
                 return null;
             }
@@ -226,6 +237,7 @@ const GamePage = () => {
             const queriedData = await getGameData();
             setGameData(queriedData);
             await getRatings();
+            await getReviews();
             setDataRetrieved(true);
         }
         fetchData();
@@ -284,6 +296,13 @@ const GamePage = () => {
                     </div>
                     <div className="col-start-2">
                         {gameData[0].screenshots ? <ScreenshotCarousel screenshots={gameData[0].screenshots} /> : null}
+                        <div className="">
+                            <h2 className="font-bold text-xl">Reviews</h2>
+                            {reviews.length === 0 && <span>No reviews found</span>}
+                            {reviews.map(review => {
+                                return <ReviewCard key={review._id} id={review._id} game={review.game} text={review.text} user={review.user} />
+                            })}
+                        </div>
                     </div>
                     {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}
                 </div>

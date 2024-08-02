@@ -8,7 +8,6 @@ const ReviewCard = ({id, game, text, user}) => {
     const CHAR_LIMIT = 500;
 
     useEffect(() => {
-        // TODO: This logic does not work for any length of text
         const numChars = text.length;
         if (numChars >= CHAR_LIMIT) {
             setShowMore(true);
@@ -22,8 +21,8 @@ const ReviewCard = ({id, game, text, user}) => {
             }
         }
 
-        getUserRating(user.id);
-    }, [id, text.length, game.id, user.id]);
+        getUserRating(user._id);
+    }, [text.length, game.id, user._id]);
 
     function limitChars(str, limit) {
         return str.length > limit ? `${str.slice(0, CHAR_LIMIT)}...` : str;
@@ -37,7 +36,7 @@ const ReviewCard = ({id, game, text, user}) => {
                     <img className="w-full h-full object-contain rounded-md" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover.image_id}.png`} alt={`${game.name} Cover`} />
                 </a>
                 <div className="flex-grow">
-                    <a href={`/profile/${user.id}`} className="flex items-center gap-2">
+                    <a href={`/profile/${user._id}`} className="flex items-center gap-2">
                         <div className="rounded-full w-8 h-8 border-black border-2 overflow-hidden">
                             <img src={ProfilePic} alt="Profile Picture" />
                         </div>
