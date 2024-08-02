@@ -171,7 +171,6 @@ const ReviewsContent = ({user}) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setReviews(data);
       }
     }

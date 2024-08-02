@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import GameCard from "../components/GameCard";
 import CategoryContainer from "../components/CategoryContainer";
-import SortSelector from "../components/SortSelector";
 
 const MyGames = () => {
   const userId = localStorage.getItem("userId");
@@ -15,7 +14,6 @@ const MyGames = () => {
       if (response.ok) {
         const games = await response.json();
         setGamesToDisplay(games);
-        console.log(gamesToDisplay);
       }
     }
 
@@ -30,13 +28,11 @@ const MyGames = () => {
           <CategoryContainer category={category} setCategory={setCategory}/>
         </div>
       </div>
-      <ul className="grid grid-cols-auto-fill-200 place-items-center gap-4 py-2">
+      <ul className="grid grid-cols-4 lg:grid-cols-8 place-items-center gap-4 py-2">
         {gamesToDisplay.length === 0 && "No Games"}
         {gamesToDisplay.map(game => {
           return (
-            <>
               <GameCard key={game.gameId} gameId={game.gameId} imageId={game.cover} title={game.name}/>
-            </>
           )
         })}
       </ul>
