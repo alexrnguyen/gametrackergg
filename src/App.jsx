@@ -20,7 +20,7 @@ function App() {
     <ErrorBoundary fallback={<ErrorPage />}>
       <div className='flex flex-col flex-nowrap min-h-screen'>
         <Navbar />
-        <div className="flex-grow w-full px-16">
+        <div className="flex-grow w-full md:px-16">
           <Routes>
             <Route path="/" element={<Home />}/>
             <Route path="my-games" element={<MyGames />}/>

@@ -8,6 +8,7 @@ import AddGameCard from "../components/AddGameCard";
 import { TiDelete } from "react-icons/ti";
 import SortSelector from "../components/SortSelector";
 import ReviewCard from "../components/ReviewCard";
+import Cookies from "js-cookie";
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -47,7 +48,7 @@ const ProfileNavbar = ({section, setSection}) => {
 }
 
 const ShowcaseContent = () => {
-  const userId = localStorage.getItem("userId");
+  const userId = Cookies.get("userId");
   const [favouriteGames, setFavouriteGames] = useState([]);
 
   useEffect(() => {
@@ -73,10 +74,11 @@ const ShowcaseContent = () => {
 
     getFavouriteGames();
   }, [userId]);
-
+  
   async function removeFavouriteGame(gameId) {
     const response = await fetch(`http://localhost:5000/api/users/${userId}/favourites/${gameId}`, {
       method: "DELETE",
+      credentials: 'include'
     });
 
     if (response.status === 204) {
@@ -116,7 +118,7 @@ const ShowcaseContent = () => {
 }
 
 const GamesContent = () => {
-  const userId = localStorage.getItem("userId");
+  const userId = Cookies.get("userId");
   const [category, setCategory] = useState("played");
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
   const [sortCriterion, setSortCriterion] = useState("date");
@@ -162,7 +164,7 @@ const GamesContent = () => {
 }
 
 const ReviewsContent = ({user}) => {
-  const userId = localStorage.getItem("userId");
+  const userId = Cookies.get("userId");
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -181,10 +183,12 @@ const ReviewsContent = ({user}) => {
   return (
     <>
       <h2 className="text-2xl">Reviews</h2>
-      <div className="flex flex-col gap-8">
-        {reviews.map(review => {
-          return <ReviewCard key={review._id} id={review._id} game={review.game} text={review.text} user={user} />
-        })}
+      <div>
+        <ul className="flex flex-col gap-8">
+          {reviews.map(review => {
+            return <ReviewCard key={review._id} id={review._id} game={review.game} text={review.text} user={user} />
+          })}
+        </ul>
       </div>
     </>
   )
@@ -192,7 +196,7 @@ const ReviewsContent = ({user}) => {
 }
 
 const Profile = () => {
-  const userId = localStorage.getItem("userId");
+  const userId = Cookies.get("userId");
   const [section, setSection] = useState("showcase");
   const [user, setUser] = useState({});
   const [dataRetrieved, setDataRetrieved] = useState(false);

@@ -27,8 +27,7 @@ router.post("/", async (req, res) => {
         // successful login
         // generate jwt
         const token = jwt.sign({id: user._id}, env.JWT_SECRET);
-        console.log(token);
-        return res.status(200).send({username: user.username, userId: user._id, token: token});
+        return res.status(200).send({username: user.username, userId: user._id, token});
       }
     } 
     // unsuccessful login

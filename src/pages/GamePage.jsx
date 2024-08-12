@@ -9,6 +9,7 @@ import ScreenshotCarousel from "../components/ScreenshotCarousel";
 import RatingDistribution from "../components/RatingDistribution";
 import ReviewModal from "../components/ReviewModal";
 import ReviewCard from "../components/ReviewCard";
+import Cookies from "js-cookie";
 
 
 const StatusContainer = (props) => {
@@ -22,7 +23,7 @@ const StatusContainer = (props) => {
     const [showModal, setShowModal] = useState(false);
 
     const {id} = useParams();
-    const userId = localStorage.getItem("userId");
+    const userId = Cookies.get("userId");
 
     useEffect(() => {
         async function getUserGameStatus() {
@@ -72,6 +73,7 @@ const StatusContainer = (props) => {
             setAlertContent(`Game added to ${category}`);
             response = await fetch(`http://localhost:5000/api/collection/${userId}`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -81,6 +83,7 @@ const StatusContainer = (props) => {
             setAlertContent(`Game removed from ${category}`);
             response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${id}/status/${category}`, {
                 method: "DELETE",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -100,6 +103,7 @@ const StatusContainer = (props) => {
         const data = {gameId: id, rating: newRating};
         const response = await fetch(`http://localhost:5000/api/collection/${userId}/rating`, {
             method: "PUT",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },

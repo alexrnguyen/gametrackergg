@@ -20,7 +20,10 @@ const users = require("./routes/users.js");
 
 // Create Express app
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // TODO: change URL to deployed instance instead of localhost
+  credentials: true}
+));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

@@ -2,10 +2,11 @@ import AddIcon from '@mui/icons-material/Add';
 import { Modal, Box, Typography, TextField } from '@mui/material';
 import { useState, useRef } from 'react';
 import SearchResults from './SearchResults';
+import Cookies from 'js-cookie';
 
 // Placeholder game card that allows users to add favourite games on click
 const AddGameCard = () => {
-    const userId = localStorage.getItem("userId");
+    const userId = Cookies.get("userId");
 
     const [showModal, setShowModal] = useState(false);
     const [searchInput, setSearchInput] = useState("");
@@ -45,6 +46,7 @@ const AddGameCard = () => {
         // Add game to favourite games array
         const response = await fetch(`http://localhost:5000/api/users/${userId}/favourites`, {
             method: "POST",
+            credentials: 'include',
             headers: {
                 "Content-Type": "application/json"
             },

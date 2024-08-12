@@ -6,10 +6,9 @@ const User = require("./models/User.js");
 // Authorize a user based on whether a valid access token is provided in the request
 async function isAuthorized(req, res, next) {
     const token = req.cookies.token;
-
     if (!token) {
         // User is not authenticated
-        return res.redirect("http://localhost:5173/sign-in");
+        return res.status(301).redirect("http://localhost:5173/signin");
     }
 
     const secret = env.JWT_SECRET;
@@ -27,9 +26,9 @@ async function isAuthorized(req, res, next) {
     } catch (err) {
         if (err.name === "JsonWebTokenError") {
             // Invalid token, prompt user to sign in
-            return res.redirect("http://localhost:5173/sign-in");
+            return res.status(301).redirect("/api/signin");
         }
-        res.status(500).send({message: "Internal server error"});
+        return res.status(301).redirect("http://localhost:5173/signin");
     }
 }
 

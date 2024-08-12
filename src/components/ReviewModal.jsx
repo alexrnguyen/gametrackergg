@@ -1,12 +1,13 @@
 import { Button, Modal, Box, Typography } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const ReviewModal = ({open, onClose}) => {
 
     const [textboxFocussed, setTextboxFocussed] = useState(false);
     const { id } = useParams();
-    const userId = localStorage.getItem("userId");
+    const userId = Cookies.get("userId");
 
     const styles = {
         modal: {
@@ -38,6 +39,7 @@ const ReviewModal = ({open, onClose}) => {
         
         const response = await fetch(`http://localhost:5000/api/reviews/`, {
             method: form.method,
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json"
             },

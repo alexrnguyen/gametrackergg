@@ -1,5 +1,7 @@
+const env = require('dotenv').config({ path: '../.env' }).parsed;
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 // MongoDB Models
@@ -26,7 +28,11 @@ router.post("/", (req, res) => {
       const user = new User({username, email, password_hash: hash});
       try {
         await user.save();
-        res.status(201).send({username: user.username, userId: user._id});
+
+        // generate jwt
+        const token = jwt.sign({id: user._id}, env.JWT_SECRET);
+
+        res.status(201).send({username: user.username, userId: user._id, token});
       } catch (err) {
         // Handle duplicate key error (username and/or email exists in database)
         if (err && err.code === 11000) {
