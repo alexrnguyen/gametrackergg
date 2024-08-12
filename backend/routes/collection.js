@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const headers = require("../headers");
+const isAuthorized = require("../auth.js");
 
 // MongoDB Models
 const Game = require("../models/Game.js");
@@ -21,7 +22,7 @@ router.get("/:userId/game/:gameId", async (req, res) => {
 });
   
 // Remove a game's status from a user's collection
-router.delete("/:userId/game/:gameId/status/:status", async (req, res) => {
+router.delete("/:userId/game/:gameId/status/:status", isAuthorized, async (req, res) => {
     const userId = req.params.userId;
     const gameId = req.params.gameId;
     const statusToDelete = req.params.status;
@@ -94,7 +95,7 @@ router.get("/:userId", async (req, res) => {
 })
   
 // Add game to a user's collection
-router.post("/:userId", async (req, res) => {
+router.post("/:userId", isAuthorized, async (req, res) => {
     const userId = req.params.userId;
     const gameId = req.body.gameId;
     let status = req.body.status;
@@ -137,17 +138,17 @@ router.post("/:userId", async (req, res) => {
 });
   
 // TODO: Change a game's status in a user's collection
-router.put("/:userId", async (req, res) => {
+router.put("/:userId", isAuthorized, async (req, res) => {
 
 })
 
 // TODO: Add rating to a game in a user's collection
-router.post("/:userId/rating", async (req, res) => {
+router.post("/:userId/rating", isAuthorized, async (req, res) => {
 
 });
   
 // Change a game's rating in a user's collection
-router.put("/:userId/rating", async (req, res) => {
+router.put("/:userId/rating", isAuthorized, async (req, res) => {
     const userId = req.params.userId;
     const gameId = req.body.gameId;
     const rating = req.body.rating;

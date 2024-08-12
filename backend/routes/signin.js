@@ -1,5 +1,7 @@
+const env = require('dotenv').config({ path: '../.env' }).parsed;
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 // MongoDB Models
@@ -7,6 +9,7 @@ const User = require("../models/User.js");
 
 // Authenticate user
 router.post("/", async (req, res) => {
+    console.log(env);
     const username = req.body.username;
     const password = req.body.password;
   
@@ -22,7 +25,10 @@ router.post("/", async (req, res) => {
       const match = await bcrypt.compare(password, hash);
       if (match) {
         // successful login
-        return res.status(200).send({username: user.username, userId: user._id});
+        // generate jwt
+        const token = jwt.sign({id: user._id}, env.JWT_SECRET);
+        console.log(token);
+        return res.status(200).send({username: user.username, userId: user._id, token: token});
       }
     } 
     // unsuccessful login

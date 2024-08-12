@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const isAuthorized = require("../auth.js");
 
 // MongoDB Models
 const User = require("../models/User.js");
@@ -7,7 +8,7 @@ const Game = require("../models/Game.js");
 const Review = require("../models/Review.js");
 
 // Create review
-router.post('/', async (req, res) => {
+router.post('/', isAuthorized, async (req, res) => {
     const userId = req.body.userId;
     const gameId = req.body.gameId;
     const text = req.body.text;
@@ -44,7 +45,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Edit a review with a given ID
-router.put("/:id", async (req, res) => {
+router.put("/:id", isAuthorized, async (req, res) => {
     const reviewId = req.params.id;
     const editedText = req.body.editedText;
 
@@ -61,7 +62,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete a review with a given ID
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAuthorized, async (req, res) => {
     const reviewId = req.params.id;
     const reviewToDelete = await Review.findOneAndDelete({_id: reviewId});
 
@@ -78,7 +79,7 @@ router.get("/:id/likes", (req, res) => {
 });
 
 // TODO: Like a review
-router.put("/:id/likes", (req, res) => {
+router.put("/:id/likes", isAuthorized, (req, res) => {
 
 });
 

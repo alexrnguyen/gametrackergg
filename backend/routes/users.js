@@ -1,6 +1,7 @@
 const express = require("express");
 const getUsers = require("../utils/getUsers.js");
 const getGames = require("../utils/getGames.js");
+const isAuthorized = require("../auth.js");
 const router = express.Router();
 
 // MongoDB Models
@@ -93,7 +94,7 @@ router.get("/:id/favourites", async (req, res) => {
 });
 
 // Add game to favourite games
-router.post("/:id/favourites", async (req, res) => {
+router.post("/:id/favourites", isAuthorized, async (req, res) => {
     const userId = req.params.id;
     const gameId = req.body.gameId;
 
@@ -122,7 +123,7 @@ router.post("/:id/favourites", async (req, res) => {
 });
 
 // Remove game from favourite games
-router.delete("/:id/favourites/:gameId", async (req, res) => {
+router.delete("/:id/favourites/:gameId", isAuthorized, async (req, res) => {
     const userId = req.params.id;
     const gameId = req.params.gameId;
 
