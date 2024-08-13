@@ -1,11 +1,13 @@
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 
 const SignIn = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [invalidLogin, setInvalidLogin] = useState(false);
+    const [cookies, setCookie, removeCookie] = useCookies(['userId', 'token'], {doNotParse: true});
 
     const navigate = useNavigate();
 
@@ -23,8 +25,8 @@ const SignIn = () => {
 
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem("username", data.username);
-            localStorage.setItem("userId", data.userId);
+            setCookie("userId", data.userId);
+            setCookie("token", data.token);
             navigate('/');
             window.location.reload();
         } else {

@@ -1,12 +1,14 @@
 import { Alert, Button, TextField } from "@mui/material";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
 
 /**
  * 
  * @returns 
  */
 const SignUp = () => {
+    const [cookies, setCookie, removeCookie] = useCookies(['userId'], {doNotParse: true});
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -41,8 +43,8 @@ const SignUp = () => {
 
             if (response.status === 201) {
                 const data = await response.json();
-                localStorage.setItem("username", data.username);
-                localStorage.setItem("userId", data.userId);
+                setCookie("userId", data.userId);
+                setCookie("token", data.token);
                 setShowAlert(true);
                 setErrorMessage("");
                 setTimeout(() => {
