@@ -1,4 +1,4 @@
-import { Link, useMatch, useResolvedPath } from "react-router-dom";
+import { Link, useMatch, useResolvedPath, useLocation } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoMdClose } from "react-icons/io";
 import Searchbar from "./Searchbar";
@@ -7,7 +7,13 @@ import { useEffect, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 
 function MobileMenu({signedIn, handleSignOut}) {
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // close menu when URL changes
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location]);
 
   return (
     <>
