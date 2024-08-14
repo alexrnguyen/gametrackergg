@@ -8,7 +8,6 @@ const GameCard = ({gameId, imageId, title}) => {
 
     const navigate = useNavigate();
     function handleClick() {
-        console.log("Clicked!")
         navigate(`/game/${gameId}`)
     }
 

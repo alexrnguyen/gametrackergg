@@ -34,7 +34,6 @@ const AddGameCard = () => {
             const response = await fetch(`http://localhost:5000/api/games?searchInput=${input}&page=1`, {signal: signal});
             const data = await response.json();
             const games = data.games;
-            console.log(games);
             setSearchResults(games);
         } catch (e) {
             // TODO: Handle errors

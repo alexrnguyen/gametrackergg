@@ -110,8 +110,6 @@ const StatusContainer = (props) => {
             body: JSON.stringify(data)
         });
 
-        console.log(response.status);
-
         if (response.status === 201 || response.status === 200) {
             setRating(newRating);
         } else {
@@ -185,7 +183,6 @@ const GamePage = () => {
             const gameResponse = await fetch(`http://localhost:5000/api/games/${id}`);
             if (gameResponse.ok) {
                 let data = await gameResponse.json();
-                console.log(data);
 
                 // Retrieve year from initial release date (first date listed)
                 let year;

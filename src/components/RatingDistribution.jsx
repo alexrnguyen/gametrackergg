@@ -2,7 +2,6 @@ import { BarChart } from '@mui/x-charts/BarChart';
 
 export default function RatingDistribution({ ratings }) {
 
-    console.log(ratings);
     return (
         <>
             <BarChart 

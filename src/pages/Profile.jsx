@@ -137,7 +137,6 @@ const GamesContent = () => {
 
   function handleCriterionChange(event) {
     setSortCriterion(event.target.value);
-    console.log(event.target.value);
   }
 
   return (

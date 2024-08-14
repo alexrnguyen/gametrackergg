@@ -30,9 +30,7 @@ const SignIn = () => {
             navigate('/');
             window.location.reload();
         } else {
-            console.log("Invalid login");
             setInvalidLogin(true);
-            console.log(invalidLogin);
         }
     }
 

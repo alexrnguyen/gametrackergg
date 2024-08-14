@@ -16,7 +16,6 @@ const SearchResultsPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const data = await getData(input.current, page);
-            console.log(data);
             setResults(data);
         }
         fetchData();
@@ -32,8 +31,7 @@ const SearchResultsPage = () => {
         return games;
     }
 
-    function handlePageChange(event, value) {
-        console.log("Page changed!", value);
+    function handlePageChange(_, value) {
         setPage(value);
     }
 

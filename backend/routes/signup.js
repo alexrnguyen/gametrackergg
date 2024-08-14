@@ -9,7 +9,6 @@ const User = require("../models/User.js");
 
 // Create a new user
 router.post("/", (req, res) => {
-    console.log(req.body);
     const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;

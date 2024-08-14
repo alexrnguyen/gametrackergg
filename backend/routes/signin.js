@@ -9,7 +9,6 @@ const User = require("../models/User.js");
 
 // Authenticate user
 router.post("/", async (req, res) => {
-    console.log(env);
     const username = req.body.username;
     const password = req.body.password;
   
