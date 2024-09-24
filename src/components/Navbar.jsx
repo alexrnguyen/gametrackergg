@@ -22,10 +22,10 @@ function MobileMenu({signedIn, handleSignOut}) {
           {signedIn ? (
             <div className="flex flex-col">
               <IoMdClose className="self-end" onClick={() => setMenuOpen(false)} />
-              <div id="nav-hamburger-menu" className="flex flex-col gap-4 fixed right-8 top-12 bg-grey z-10 p-8">
+              <div id="nav-hamburger-menu" className="flex flex-col gap-4 fixed right-8 top-12 bg-black z-10 p-8 rounded-md">
                 <CustomLink className="text-start" to="/my-games">My Games</CustomLink>
-                <CustomLink className="text-start" to="/profile">Profile</CustomLink>
-                <button className="text-start hover:bg-lightgrey" onClick={() => handleSignOut()}>Sign Out</button>
+                <CustomLink className="text-start" to={`/profile/${Cookies.get("userId")}`}>Profile</CustomLink>
+                <button className="text-start hover:bg-lightgrey p-2 rounded-sm" onClick={() => handleSignOut()}>Sign Out</button>
               </div>
             </div>
           ): (
@@ -68,15 +68,15 @@ function Navbar() {
 
       {isMobile ? <MobileMenu signedIn={signedIn} handleSignOut={handleSignOut} /> 
         : (
-          <ul className="flex justify-end gap-4 flex-grow">
+          <ul className="flex justify-end items-center gap-4 flex-grow">
             {signedIn ? (
               <>
                 <CustomLink to="/my-games">My Games</CustomLink>
-                <CustomLink to="/profile">Profile</CustomLink>
-                <button className="hover:bg-lightgrey" onClick={() => handleSignOut()}>Sign Out</button>
+                <CustomLink to={`/profile/${Cookies.get("userId")}`}>Profile</CustomLink>
+                <button className="hover:bg-lightgrey p-2 rounded-sm" onClick={() => handleSignOut()}>Sign Out</button>
               </>
             ) : (
-              <CustomLink className="hover:bg-lightgrey" to="/sign-in">Sign In</CustomLink>
+              <CustomLink className="hover:bg-lightgrey p-2 rounded-sm" to="/sign-in">Sign In</CustomLink>
             )}
           </ul>
         )
@@ -90,7 +90,7 @@ function CustomLink({ to, children }) {
   const isActive = useMatch({ path: resolvedPath.pathname, end: true });
   return (
     <li>
-      <Link className={isActive ? "bg-grey hover:bg-lightgrey" : "hover:bg-lightgrey"} to={to}>{children}</Link>
+      <Link className={isActive ? "bg-grey hover:bg-lightgrey p-2 rounded-sm" : "hover:bg-lightgrey p-2 rounded-sm"} to={to}>{children}</Link>
     </li>
   );
 }
