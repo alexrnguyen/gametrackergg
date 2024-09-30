@@ -86,6 +86,7 @@ const AddGameCard = () => {
             width: 500,
             bgcolor: 'background.paper',
             border: '2px solid #000',
+            borderRadius: '10px',
             boxShadow: 24,
             p: 4,
         }
@@ -93,7 +94,7 @@ const AddGameCard = () => {
 
     return (
         <>
-            <div id="card-outline" className="relative outline-dashed outline-1 rounded-md w-52 h-64" onClick={handleOpen}>
+            <div id="card-outline" className="relative outline-dashed outline-1 rounded-md w-40 h-52" onClick={handleOpen}>
                 <AddIcon style={styles.addIcon}/>
             </div>
             <Modal

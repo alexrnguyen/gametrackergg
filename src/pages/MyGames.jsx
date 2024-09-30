@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import GameCard from "../components/GameCard";
 import CategoryContainer from "../components/CategoryContainer";
+import Cookies from "js-cookie";
 
 const MyGames = () => {
-  const userId = localStorage.getItem("userId");
+  const userId = Cookies.get("userId");
 
   const [category, setCategory] = useState("played");
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
