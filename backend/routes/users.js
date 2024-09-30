@@ -34,7 +34,8 @@ router.get("/:id/reviews", async (req, res) => {
     if (user === null) {
         return res.status(404).send("User not found");
     }
-    
+
+    // TODO: Implement sort functionality
     const reviewsData = await Review.find({'userId': userId});
     const reviews = reviewsData.map(reviewData => reviewData.toObject());
 
@@ -43,7 +44,7 @@ router.get("/:id/reviews", async (req, res) => {
     const games = await getGames(gameIds);
 
     for (let i = 0; i < reviews.length; i++) {
-        reviews[i] = {...reviews[i], game: games[i]};
+        reviews[i] = {...reviews[i], game: games[i], user};
     }
     return res.status(200).send(reviews);
 });

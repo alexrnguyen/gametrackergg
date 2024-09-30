@@ -34,20 +34,21 @@ router.post('/', isAuthorized, async (req, res) => {
 // Get a review by ID
 router.get("/:id", async (req, res) => {
     const reviewId = req.params.id;
-
     const review = await Review.findById(reviewId);
 
     if (review === null) {
         return res.status(404).send("Review not found");
     }
 
-    res.status(200).send(review);
+    const user = await User.findById(review.userId);
+    const game = await Game.findOne({"gameId": review.gameId});
+    res.status(200).send({text: review.text, dateCreated: review.dateCreated, user, game});
 });
 
 // Edit a review with a given ID
 router.put("/:id", isAuthorized, async (req, res) => {
     const reviewId = req.params.id;
-    const editedText = req.body.editedText;
+    const editedText = req.body.text;
 
     const review = await Review.findById(reviewId);
 
