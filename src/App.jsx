@@ -24,7 +24,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />}/>
             <Route path="my-games" element={<MyGames />}/>
-            <Route path="profile" element={<Profile />}/>
+            <Route path="profile/:uid" element={<Profile />}/>
             <Route path='following/:uid' element={<Following />}/>
             <Route path='followers/:uid' element={<Followers />}/>
             <Route path='search-results' element={<SearchResultsPage route={{input: ""}}/>}/>

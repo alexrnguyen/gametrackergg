@@ -8,8 +8,8 @@ import { PlayArrow } from "@mui/icons-material";
 import ScreenshotCarousel from "../components/ScreenshotCarousel";
 import RatingDistribution from "../components/RatingDistribution";
 import ReviewModal from "../components/ReviewModal";
-import ReviewCard from "../components/ReviewCard";
 import Cookies from "js-cookie";
+import ReviewsList from "../components/ReviewsList";
 
 
 const StatusContainer = (props) => {
@@ -151,7 +151,7 @@ const StatusContainer = (props) => {
                             <p>Wishlist</p>
                         </IconButton>
                     </ButtonGroup>
-                    <ReviewModal open={showModal} onClose={() => setShowModal(false)}/>
+                    <ReviewModal open={showModal} onClose={() => setShowModal(false)} newReview={true} />
                 </div>   
             </Card> : <Card variant="outlined" className="h-fit text-center p-4"><a href="/sign-in">Sign in to track, rate, or review</a></Card>}
         </>
@@ -255,7 +255,7 @@ const GamePage = () => {
     return (
         <>
             {dataRetrieved ? (
-                <div className="grid grid-cols-[1fr_4fr] p-4 gap-8">
+                <div className="grid grid-cols-[1fr_2fr] lg:grid-cols-[1fr_4fr] p-4 gap-8">
                     <img className="place-self-center" src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${gameData[0].cover ? gameData[0].cover.image_id : null}.png`} alt="" />
                     <div id="info-container" className="flex flex-col gap-4">
                         <h1 className="font-bold text-3xl">{gameData[0].name} <span className="text-3xl">({gameData.year})</span></h1>
@@ -299,10 +299,7 @@ const GamePage = () => {
                         {gameData[0].screenshots ? <ScreenshotCarousel screenshots={gameData[0].screenshots} /> : null}
                         <div className="">
                             <h2 className="font-bold text-xl">Reviews</h2>
-                            {reviews.length === 0 && <span>No reviews found</span>}
-                            {reviews.map(review => {
-                                return <ReviewCard key={review._id} id={review._id} game={review.game} text={review.text} user={review.user} />
-                            })}
+                            <ReviewsList reviewsList={reviews} />
                         </div>
                     </div>
                     {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}

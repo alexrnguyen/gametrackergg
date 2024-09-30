@@ -1,4 +1,4 @@
-import { ToggleButton, ToggleButtonGroup, CircularProgress } from "@mui/material";
+import { ToggleButton, ToggleButtonGroup, CircularProgress, Button } from "@mui/material";
 import PropTypes from 'prop-types';
 import { useEffect, useState } from "react";
 import GameCard from "../components/GameCard";
@@ -7,8 +7,9 @@ import CategoryContainer from "../components/CategoryContainer";
 import AddGameCard from "../components/AddGameCard";
 import { TiDelete } from "react-icons/ti";
 import SortSelector from "../components/SortSelector";
-import ReviewCard from "../components/ReviewCard";
 import Cookies from "js-cookie";
+import ReviewsList from "../components/ReviewsList";
+import { useParams } from "react-router-dom";
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -48,12 +49,13 @@ const ProfileNavbar = ({section, setSection}) => {
 }
 
 const ShowcaseContent = () => {
-  const userId = Cookies.get("userId");
+  const { uid } = useParams();
+  const currentUserId = Cookies.get("userId");
   const [favouriteGames, setFavouriteGames] = useState([]);
 
   useEffect(() => {
     async function getFavouriteGames() {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/favourites`);
+      const response = await fetch(`http://localhost:5000/api/users/${uid}/favourites`);
 
       if (response.ok) {
         const favouriteGameIds = await response.json();
@@ -73,10 +75,10 @@ const ShowcaseContent = () => {
     }
 
     getFavouriteGames();
-  }, [userId]);
+  }, [uid]);
   
   async function removeFavouriteGame(gameId) {
-    const response = await fetch(`http://localhost:5000/api/users/${userId}/favourites/${gameId}`, {
+    const response = await fetch(`http://localhost:5000/api/users/${uid}/favourites/${gameId}`, {
       method: "DELETE",
       credentials: 'include'
     });
@@ -98,13 +100,15 @@ const ShowcaseContent = () => {
               return (
                 <div className="relative" key={game.id}>
                   <GameCard gameId={game.id} imageId={game.cover ? game.cover.image_id : null} title={game.name}/>
-                  <div className="cursor-pointer absolute top-0 right-0">
-                    <TiDelete style={{width: "30", height: "30", color: "red"}} onClick={() => removeFavouriteGame(game.id)} />
-                  </div>
+                  {uid === currentUserId && 
+                    <div className="cursor-pointer absolute top-0 right-0">
+                      <TiDelete style={{width: "30", height: "30", color: "red", boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}} onClick={() => removeFavouriteGame(game.id)} />
+                    </div>
+                  }
                 </div>
               )
           })}
-          {favouriteGames.length < 4 ? <AddGameCard /> : null}
+          {favouriteGames.length < 4 && uid === currentUserId ? <AddGameCard /> : null}
         </ul>
       </div>
       <div id="reviews">
@@ -118,7 +122,7 @@ const ShowcaseContent = () => {
 }
 
 const GamesContent = () => {
-  const userId = Cookies.get("userId");
+  const { uid } = useParams();
   const [category, setCategory] = useState("played");
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
   const [sortCriterion, setSortCriterion] = useState("date");
@@ -132,8 +136,8 @@ const GamesContent = () => {
       }
     }
 
-    getGames(userId, category);
-  }, [userId, category, sortCriterion]);
+    getGames(uid, category);
+  }, [uid, category, sortCriterion]);
 
   function handleCriterionChange(event) {
     setSortCriterion(event.target.value);
@@ -162,13 +166,14 @@ const GamesContent = () => {
 
 }
 
-const ReviewsContent = ({user}) => {
-  const userId = Cookies.get("userId");
+const ReviewsContent = () => {
+  const { uid } = useParams();
   const [reviews, setReviews] = useState([]);
+  const [sortCriterion, setSortCriterion] = useState("date");
 
   useEffect(() => {
     async function getUserReviews(userId) {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/reviews`);
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/reviews?sortBy=${sortCriterion}`);
 
       if (response.ok) {
         const data = await response.json();
@@ -176,33 +181,36 @@ const ReviewsContent = ({user}) => {
       }
     }
 
-    getUserReviews(userId);
-  }, [userId]);
+    getUserReviews(uid);
+  }, [uid, sortCriterion]);
 
+  function handleCriterionChange(event) {
+    setSortCriterion(event.target.value);
+  }
+
+  console.log(reviews);
   return (
     <>
-      <h2 className="text-2xl">Reviews</h2>
-      <div>
-        <ul className="flex flex-col gap-8">
-          {reviews.map(review => {
-            return <ReviewCard key={review._id} id={review._id} game={review.game} text={review.text} user={user} />
-          })}
-        </ul>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl">Reviews</h2>
+        <SortSelector defaultValue={sortCriterion} onChange={handleCriterionChange} />
       </div>
+      <ReviewsList key={reviews} reviewsList={reviews} />
     </>
   )
 
 }
 
 const Profile = () => {
-  const userId = Cookies.get("userId");
+  const { uid } = useParams();
+  const currentUserId = Cookies.get("userId");
   const [section, setSection] = useState("showcase");
   const [user, setUser] = useState({});
   const [dataRetrieved, setDataRetrieved] = useState(false);
 
   useEffect(() => {
-    async function getUser(userId) {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`);
+    async function getUser(uid) {
+      const response = await fetch(`http://localhost:5000/api/users/${uid}`);
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
@@ -210,8 +218,16 @@ const Profile = () => {
       }
     }
 
-    getUser(userId);
-  }, [userId]);
+    getUser(uid);
+  }, [uid]);
+
+  function handleFollow() {
+    
+  }
+
+  function handleUnfollow() {
+    // TODO: Implement unfollow functionality
+  }
 
   return (
     <>
@@ -219,19 +235,22 @@ const Profile = () => {
         <div className="p-4">
           <header id="profile-header" className="mb-4">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="rounded-full w-24 h-24 border-black border-2 overflow-hidden">
-                  <img src={ProfilePic} alt="Profile Picture" />
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-full w-24 h-24 border-black border-2 overflow-hidden">
+                    <img src={ProfilePic} alt="Profile Picture" />
+                  </div>
+                  <span className="text-2xl" id="profile-username">{user.username}</span>
                 </div>
-                <span className="text-2xl" id="profile-username">{user.username}</span>
+                {uid !== currentUserId ? <Button variant="contained" onClick={handleFollow}>Follow</Button> : null}
               </div>
               <StatsContainer/>
               <div className="flex gap-4">
-                <a className="flex flex-col items-center" href={`/following/${userId}`}>
+                <a className="flex flex-col items-center" href={`/following/${currentUserId}`}>
                   <h4>Following</h4>
                   <span id="following" className="font-bold">{user.following.length}</span>
                 </a>
-                <a className="flex flex-col items-center" href={`/followers/${userId}`}>
+                <a className="flex flex-col items-center" href={`/followers/${currentUserId}`}>
                   <h4>Followers</h4>
                   <span id="followers" className="font-bold">{user.followers.length}</span>
                 </a>
