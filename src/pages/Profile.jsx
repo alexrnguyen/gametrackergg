@@ -207,9 +207,10 @@ const Profile = () => {
   const [section, setSection] = useState("showcase");
   const [user, setUser] = useState({});
   const [dataRetrieved, setDataRetrieved] = useState(false);
+  const [followsUser, setFollowsUser] = useState(false);
 
   useEffect(() => {
-    async function getUser(uid) {
+    async function getUser() {
       const response = await fetch(`http://localhost:5000/api/users/${uid}`);
       if (response.ok) {
         const userData = await response.json();
@@ -218,15 +219,50 @@ const Profile = () => {
       }
     }
 
-    getUser(uid);
-  }, [uid]);
+    async function followsUser() {
+      const response = await fetch(`http://localhost:5000/api/users/${currentUserId}/follows/${uid}`);
+      if (response.ok) {
+        setFollowsUser(true);
+      }
+    }
 
-  function handleFollow() {
-    
+    getUser();
+    followsUser();
+  }, [uid, currentUserId]);
+
+  async function handleFollow() {
+    const response = await fetch(`http://localhost:5000/api/users/${currentUserId}/follow/${uid}`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+          "Content-Type": "application/json"
+      }
+    });
+    if (response.ok) {
+      setFollowsUser(true);
+    }
   }
 
-  function handleUnfollow() {
+  async function handleUnfollow() {
     // TODO: Implement unfollow functionality
+    const response = await fetch(`http://localhost:5000/api/users/${currentUserId}/follow/${uid}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+          "Content-Type": "application/json"
+      }
+    });
+    if (response.status === 204) {
+      setFollowsUser(false);
+    }
+  }
+
+  function renderFollowButton() {
+    if (uid !== currentUserId && followsUser) {
+      return <Button variant="contained" color="error" className="w-3/4" onClick={handleUnfollow}>Unfollow</Button>
+    } else if (uid !== currentUserId) {
+      return <Button variant="contained" className="w-3/4" onClick={handleFollow}>Follow</Button>
+    }
   }
 
   return (
@@ -242,15 +278,15 @@ const Profile = () => {
                   </div>
                   <span className="text-2xl" id="profile-username">{user.username}</span>
                 </div>
-                {uid !== currentUserId ? <Button variant="contained" onClick={handleFollow}>Follow</Button> : null}
+                {renderFollowButton()}
               </div>
               <StatsContainer/>
               <div className="flex gap-4">
-                <a className="flex flex-col items-center" href={`/following/${currentUserId}`}>
+                <a className="flex flex-col items-center" href={`/following/${uid}`}>
                   <h4>Following</h4>
                   <span id="following" className="font-bold">{user.following.length}</span>
                 </a>
-                <a className="flex flex-col items-center" href={`/followers/${currentUserId}`}>
+                <a className="flex flex-col items-center" href={`/followers/${uid}`}>
                   <h4>Followers</h4>
                   <span id="followers" className="font-bold">{user.followers.length}</span>
                 </a>

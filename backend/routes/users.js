@@ -145,8 +145,75 @@ router.delete("/:id/favourites/:gameId", isAuthorized, async (req, res) => {
     await user.save();
 
     res.status(204).send();
+});
+
+// Check if a user follows another user
+router.get("/:id1/follows/:id2", async (req, res) => {
+    const userId1 = req.params.id1;
+    const userId2 = req.params.id2;
+
+    const user1 = await User.findById(userId1);
+
+    if (user1.following.includes(userId2)) {
+        return res.status(200).send(`User with id ${userId1} follows user with id ${userId2}`);
+    }
+
+    return res.status(404).send(`User with id ${userId1} does not follow user with id ${userId2}`);
+});
+
+// Follow another user
+router.post("/:senderId/follow/:recipientId", isAuthorized, async (req, res) => {
+    const senderId = req.params.senderId;
+    const recipientId = req.params.recipientId;
+
+    const sender = await User.findById(senderId);
+    const recipient = await User.findById(recipientId);
+
+    if (sender === null) {
+        return res.status(404).send("Sender not found");
+    } else if (recipient === null) {
+        return res.status(404).send("Recipient not found");
+    }
 
 
+    if (recipient.followers.includes(senderId)) {
+        return res.status(200).send(`User with id ${senderId} already follows user with id ${recipientId}`);
+    }
+
+    recipient.followers.push(senderId);
+    sender.following.push(recipientId);
+    await recipient.save();
+    await sender.save();
+
+    res.status(200).send();
+});
+
+
+// Unfollow another user
+router.delete("/:senderId/follow/:recipientId", isAuthorized, async (req, res) => {
+    // TODO: Code below is repeated from follow user endpoint (refactor into a function)
+    const senderId = req.params.senderId;
+    const recipientId = req.params.recipientId;
+
+    const sender = await User.findById(senderId);
+    const recipient = await User.findById(recipientId);
+
+    if (sender === null) {
+        return res.status(404).send("Sender not found");
+    } else if (recipient === null) {
+        return res.status(404).send("Recipient not found");
+    }
+
+    if (!sender.following.includes(recipientId)) {
+        return res.status(404).send(`User with id ${senderId} does not follow user with id ${recipientId}`);
+    }
+
+    recipient.followers.splice(recipient.followers.indexOf(senderId), 1);
+    sender.following.splice(sender.following.indexOf(recipientId), 1);
+    await recipient.save();
+    await sender.save();
+
+    res.status(204).send();
 });
 
 module.exports = router;
