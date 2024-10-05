@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const headers = require("../headers");
-const isAuthorized = require("../auth.js");
+const isAuthorized = require("../middleware/auth.js");
 
 // MongoDB Models
 const Game = require("../models/Game.js");

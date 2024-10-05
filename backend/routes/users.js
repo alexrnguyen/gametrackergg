@@ -1,7 +1,7 @@
 const express = require("express");
 const getUsers = require("../utils/getUsers.js");
 const getGames = require("../utils/getGames.js");
-const isAuthorized = require("../auth.js");
+const isAuthorized = require("../middleware/auth.js");
 const router = express.Router();
 
 // MongoDB Models

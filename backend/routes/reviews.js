@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const isAuthorized = require("../auth.js");
+const isAuthorized = require("../middleware/auth.js");
 
 // MongoDB Models
 const User = require("../models/User.js");
