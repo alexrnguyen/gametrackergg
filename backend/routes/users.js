@@ -7,6 +7,8 @@ const router = express.Router();
 // MongoDB Models
 const User = require("../models/User.js");
 const Review = require("../models/Review.js");
+const Notification = require("../models/Notification.js");
+const Game = require("../models/Game.js");
 
 const FAVOURITE_GAMES_LIMIT = 4;
 
@@ -164,6 +166,11 @@ router.get("/:id1/follows/:id2", async (req, res) => {
 // Follow another user
 router.post("/:senderId/follow/:recipientId", isAuthorized, async (req, res) => {
     const senderId = req.params.senderId;
+    
+    if (senderId !== req.user._id.toString()) {
+        return res.status(403).send();
+    }
+
     const recipientId = req.params.recipientId;
 
     const sender = await User.findById(senderId);
@@ -193,6 +200,11 @@ router.post("/:senderId/follow/:recipientId", isAuthorized, async (req, res) => 
 router.delete("/:senderId/follow/:recipientId", isAuthorized, async (req, res) => {
     // TODO: Code below is repeated from follow user endpoint (refactor into a function)
     const senderId = req.params.senderId;
+
+    if (senderId !== req.user._id.toString()) {
+        return res.status(403).send();
+    }
+
     const recipientId = req.params.recipientId;
 
     const sender = await User.findById(senderId);
@@ -214,6 +226,83 @@ router.delete("/:senderId/follow/:recipientId", isAuthorized, async (req, res) =
     await sender.save();
 
     res.status(204).send();
+});
+
+// Get all user notifications
+router.get("/:id/notifications", isAuthorized, async (req, res) => {
+    const userId = req.params.id;
+    const notifications = await Notification.find({'recipientUserId': userId});
+
+    res.status(200).send(notifications);
+});
+
+// Create a new notification
+router.post("/:id/notifications", isAuthorized, async (req, res) => {
+    const actionUserId = req.body.actionUserId;
+    const recipientUserId = req.params.id;
+    const action = req.body.action;
+    const gameId = req.body.gameId;
+    const dateCreated = new Date(); // in UTC
+
+    const actionUser = await User.findById(actionUserId);
+    if (actionUser === null) {
+        return res.status(404).send("Action user not found");
+    }
+
+    const recipientUser = await User.findById(recipientUserId);
+    if (recipientUser === null) {
+        return res.status(404).send("Recipient user not found");
+    }
+
+    if (!gameId && action !== "follow") {
+        return res.status(400).send("Missing gameId in request body");
+    }
+    const game = await Game.find({"gameId": gameId});
+
+    let text;
+    switch(action) {
+        case "follow":
+            text = `${actionUser.username} is now following you`;
+            break;
+        case "review":
+            text = `${actionUser.username} reviewed ${game.name}`;
+            break;
+        case "comment":
+            text = `${actionUser.username} commented on your review`;
+            break;
+
+        case "like":
+            text = `${actionUser.username} liked your review`;
+            break;
+
+        case "playing":
+            text = `${actionUser.username} is now playing ${game.name}`;
+            break;
+
+        case "played":
+            text = `${actionUser.username} played ${game.name}`;
+            break;
+
+        case "backlog":
+            text = `${actionUser.username} added ${game.name} to their backlog`;
+            break;
+
+        case "wishlist":
+            text = `${actionUser.username} added ${game.name} to their wishlist`;
+            break;
+        default:
+            return res.status(400).send("Invalid action parameter given in request body. The action parameter must be one of the following: follow, review, comment, like, playing, played, backlog, wishlist");
+    }
+
+    let notification;
+    if (gameId) {
+        const game = await Game.find({"gameId": gameId});
+        notification = new Notification({action, actionUserId, recipientUserId, text, game, dateCreated});
+    } else {
+        notification = new Notification({action, actionUserId, recipientUserId, text, dateCreated});
+    }
+    await notification.save();
+    res.status(201).send(notification);
 });
 
 module.exports = router;
