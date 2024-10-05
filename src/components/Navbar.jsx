@@ -23,7 +23,7 @@ function MobileMenu({signedIn, handleSignOut}) {
             <div className="flex flex-col">
               <IoMdClose className="self-end" onClick={() => setMenuOpen(false)} />
               <div id="nav-hamburger-menu" className="flex flex-col gap-4 fixed right-8 top-12 bg-black z-10 p-8 rounded-md">
-                <CustomLink className="text-start" to="/my-games">My Games</CustomLink>
+                <CustomLink className="text-start" to={`/activity`}>Activity</CustomLink>
                 <CustomLink className="text-start" to={`/profile/${Cookies.get("userId")}`}>Profile</CustomLink>
                 <button className="text-start hover:bg-lightgrey p-2 rounded-sm" onClick={() => handleSignOut()}>Sign Out</button>
               </div>
@@ -71,7 +71,7 @@ function Navbar() {
           <ul className="flex justify-end items-center gap-4 flex-grow">
             {signedIn ? (
               <>
-                <CustomLink to="/my-games">My Games</CustomLink>
+                <CustomLink to={`/activity`}>Activity</CustomLink>
                 <CustomLink to={`/profile/${Cookies.get("userId")}`}>Profile</CustomLink>
                 <button className="hover:bg-lightgrey p-2 rounded-sm" onClick={() => handleSignOut()}>Sign Out</button>
               </>

@@ -1,6 +1,5 @@
 import './styles.css'
 import Home from "./pages/Home";
-import MyGames from "./pages/MyGames";
 import Profile from "./pages/Profile";
 import Navbar from './components/Navbar'
 import { Route, Routes } from 'react-router-dom'
@@ -13,6 +12,7 @@ import Following from './pages/Following';
 import Followers from './pages/Followers';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorPage from './pages/ErrorPage';
+import ActivityPage from './pages/ActivityPage';
 
 function App() {
 
@@ -23,7 +23,7 @@ function App() {
         <div className="flex-grow w-full md:px-16">
           <Routes>
             <Route path="/" element={<Home />}/>
-            <Route path="my-games" element={<MyGames />}/>
+            <Route path="activity" element={<ActivityPage />}/>
             <Route path="profile/:uid" element={<Profile />}/>
             <Route path='following/:uid' element={<Following />}/>
             <Route path='followers/:uid' element={<Followers />}/>
