@@ -9,6 +9,7 @@ const User = require("../models/User.js");
 const Review = require("../models/Review.js");
 const Notification = require("../models/Notification.js");
 const Game = require("../models/Game.js");
+const UserGameStatus = require("../models/UserGameStatus.js");
 
 const FAVOURITE_GAMES_LIMIT = 4;
 
@@ -29,6 +30,7 @@ router.get("/:id", async (req, res) => {
 router.get("/:id/reviews", async (req, res) => {
     // TODO: Add page and size parameters to this endpoint
     const userId = req.params.id;
+    const sortCriterion = req.query.sortBy;
 
     const user = await User.findById(userId);
 
@@ -37,8 +39,45 @@ router.get("/:id/reviews", async (req, res) => {
         return res.status(404).send("User not found");
     }
 
-    // TODO: Implement sort functionality
-    const reviewsData = await Review.find({'userId': userId});
+    // Sort reviews if sort criterion is given
+    // TODO: Fix case where user has reviewed game without rating it (move rating to Review model)
+    let reviewsData;
+    if (sortCriterion) {
+        switch (sortCriterion) {
+          case "date": {
+            // sort by date reviewed
+            reviewsData = await Review.find({'userId': userId}).sort({'dateCreated': -1});
+            break;
+          }
+          case "rating": {
+            // sort by user rating
+            const gameStatuses = await UserGameStatus.find({'userId': userId}).sort({'rating': -1});
+            const gameIds = gameStatuses.map(status => status.gameId || null);
+            const queries = [];
+            for (const gameId of gameIds) {
+                const gameQuery = Review.findOne({gameId: gameId, userId: userId});
+                queries.push(gameQuery);
+            }
+            reviewsData = await Promise.all(queries); // get all ratings
+            reviewsData = reviewsData.filter(review => review !== null); // remove results with no reviews
+            break;
+          }
+          default: {
+            // sort by name (alphabetical)
+            const unsortedReviews = await Review.find({'userId': userId})
+            const gameIds = unsortedReviews.map(status => status.gameId || null);
+            const games = await Game.find({gameId: { "$in": gameIds} }).sort("name");
+            const queries = [];
+            for (const game of games) {
+                const gameQuery = Review.findOne({gameId: game.gameId, userId: userId});
+                queries.push(gameQuery);
+            }
+            reviewsData = await Promise.all(queries);
+          }
+        }
+    } else {
+        reviewsData = await Review.find({'userId': userId});
+    }
     const reviews = reviewsData.map(reviewData => reviewData.toObject());
 
     // Get game details for each review

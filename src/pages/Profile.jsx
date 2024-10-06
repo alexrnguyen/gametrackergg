@@ -102,7 +102,7 @@ const ShowcaseContent = () => {
                   <GameCard gameId={game.id} imageId={game.cover ? game.cover.image_id : null} title={game.name}/>
                   {uid === currentUserId && 
                     <div className="cursor-pointer absolute top-0 right-0">
-                      <TiDelete style={{width: "30", height: "30", color: "red", boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}} onClick={() => removeFavouriteGame(game.id)} />
+                      <TiDelete style={{width: "30", height: "30", color: "red", backgroundColor: "black", borderRadius: "100%"}} onClick={() => removeFavouriteGame(game.id)} />
                     </div>
                   }
                 </div>
@@ -188,7 +188,6 @@ const ReviewsContent = () => {
     setSortCriterion(event.target.value);
   }
 
-  console.log(reviews);
   return (
     <>
       <div className="flex justify-between items-center">

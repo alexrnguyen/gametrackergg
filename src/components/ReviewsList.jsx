@@ -11,6 +11,10 @@ const ReviewsList = ({reviewsList}) => {
     const [alertContent, setAlertContent] = useState("");
 
     useEffect(() => {
+        setReviews(reviewsList);
+    }, [reviewsList])
+
+    useEffect(() => {
         if (showAlert) {
             // Display alert for 2 seconds
             const timeout = setTimeout(() => setShowAlert(false), 2000);

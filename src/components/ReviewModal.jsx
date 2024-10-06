@@ -10,7 +10,6 @@ const ReviewModal = ({open, onClose, newReview = false, reviewId = null}) => {
     const userId = Cookies.get("userId");
 
     useEffect(() => {
-        console.log(newReview, reviewId);
         async function getReview(id) {
             const reviewResponse = await fetch(`http://localhost:5000/api/reviews/${id}`);
             if (reviewResponse.ok) {
