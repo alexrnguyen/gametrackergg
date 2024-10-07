@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Cookies from "js-cookie";
+import { PushPin } from "@mui/icons-material";
 
 // TODO: handleEdit and handleDelete aren't used here, but are required since OptionsMenu needs them (FIX PROP DRILLING)
 const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
@@ -37,6 +38,18 @@ const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
         return str.length > limit ? `${str.slice(0, CHAR_LIMIT)}...` : str;
     }
 
+    async function handlePin(id) {
+        const response = await fetch(`http://localhost:5000/api/users/${user._id}/reviews/pin/${id}`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        // TODO: Show alert when review is successfully pinned 
+    }
+
     return (
         <div className="w-full md:w-3/4">
             <hr />
@@ -52,7 +65,7 @@ const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
                             </div>
                             <span>{user.username}</span>
                         </a>
-                        {currentUserId === user._id && <OptionsMenu handleEdit={handleEdit} handleDelete={handleDelete}/>}
+                        {currentUserId === user._id && <OptionsMenu handleEdit={handleEdit} handlePin={() => handlePin(id)} handleDelete={handleDelete}/>}
                     </div>
                     <div className="flex items-center gap-2 mt-2">
                         <span>{game.name} ({game.release_dates[0].y})</span>
@@ -68,7 +81,7 @@ const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
     )
 }
   
-const OptionsMenu = ({handleEdit, handleDelete}) => {
+const OptionsMenu = ({handleEdit, handlePin, handleDelete}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     
@@ -106,6 +119,10 @@ const OptionsMenu = ({handleEdit, handleDelete}) => {
             <MenuItem onClick={handleEdit} disableRipple>
             <EditIcon />
                 Edit
+            </MenuItem>
+            <MenuItem onClick={handlePin} disableRipple>
+            <PushPin />
+                Pin
             </MenuItem>
             <MenuItem onClick={handleDelete} disableRipple>
             <DeleteIcon />

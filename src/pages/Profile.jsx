@@ -52,6 +52,7 @@ const ShowcaseContent = () => {
   const { uid } = useParams();
   const currentUserId = Cookies.get("userId");
   const [favouriteGames, setFavouriteGames] = useState([]);
+  const [pinnedReviews, setPinnedReviews] = useState([]);
 
   useEffect(() => {
     async function getFavouriteGames() {
@@ -74,7 +75,16 @@ const ShowcaseContent = () => {
       }
     }
 
+    async function getPinnedReviews() {
+      const response = await fetch(`http://localhost:5000/api/users/${uid}/reviews/pinned`);
+      if (response.ok) {
+        const data = await response.json();
+        setPinnedReviews(data);
+      }
+    }
+
     getFavouriteGames();
+    getPinnedReviews();
   }, [uid]);
   
   async function removeFavouriteGame(gameId) {
@@ -92,7 +102,7 @@ const ShowcaseContent = () => {
   }
 
   return (
-    <div className="flex gap-8">
+    <div className="flex gap-8 justify-between">
       <div id="favourite-games" className="">
         <h2 className="text-xl">Favourite Games</h2>
         <ul className='flex gap-4'>
@@ -111,11 +121,9 @@ const ShowcaseContent = () => {
           {favouriteGames.length < 4 && uid === currentUserId ? <AddGameCard /> : null}
         </ul>
       </div>
-      <div id="reviews">
+      <div id="reviews" className="w-1/2">
         <h2 className="text-xl">Pinned Reviews</h2>
-          {/* Display most recent reviews*/}
-          <ul className="flex flex-col gap-8">
-          </ul>
+        <ReviewsList key={pinnedReviews} reviewsList={pinnedReviews}/>
       </div>
     </div>
   )

@@ -11,7 +11,9 @@ const Notification = require("../models/Notification.js");
 const Game = require("../models/Game.js");
 const UserGameStatus = require("../models/UserGameStatus.js");
 
+// Constants
 const FAVOURITE_GAMES_LIMIT = 4;
+const PINNED_REVIEW_LIMIT = 2;
 
 
 // Get user details
@@ -88,6 +90,55 @@ router.get("/:id/reviews", async (req, res) => {
         reviews[i] = {...reviews[i], game: games[i], user};
     }
     return res.status(200).send(reviews);
+});
+
+// Get pinned user reviews
+router.get("/:id/reviews/pinned", async (req, res) => {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+
+    // Verify that user exists
+    if (user === null) {
+        return res.status(404).send("User not found");
+    }
+
+    // Get copy of pinnedReviews
+    const pinnedReviewsData = user.pinned_reviews.slice();
+    const pinnedReviews = pinnedReviewsData.map(review => review._doc);
+
+    // Get game details for each review
+    const gameIds = pinnedReviews.map(review => review.gameId);
+    const games = await getGames(gameIds);
+    for (let i = 0; i < pinnedReviews.length; i++) {
+        pinnedReviews[i] = {...pinnedReviews[i], game: games[i], user};
+    }
+    return res.status(200).send(pinnedReviews);
+});
+
+// Add a review to pinned reviews
+router.post("/:id/reviews/pin/:reviewId", isAuthorized, async (req, res) => {
+    const userId = req.params.id;
+    const reviewId = req.params.reviewId;
+
+    const user = await User.findById(userId);
+
+    if (user === null) {
+        return res.status(404).send("User not found");
+    }
+
+    const review = await Review.findById(reviewId);
+
+    if (review === null) {
+        return res.status(404).send("Review not found");
+    }
+
+    if (user.pinned_reviews.length >= PINNED_REVIEW_LIMIT) {
+        return res.status(400).send("Maximum pinned reviews reached (4)");
+    }
+
+    user.pinned_reviews.push(review);
+    await user.save();
+    return res.status(200).send();
 });
 
 // Get all users a user follows
