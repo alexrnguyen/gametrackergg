@@ -1,7 +1,7 @@
 
 // Convert game IDs to Game JSON objects
 async function getGames(gameIds) {
-    const promises = [];
+  const promises = [];
   const url = "https://api.igdb.com/v4/games/";
   const headers = require("../headers.js");
   for (const gameId of gameIds) {
