@@ -1,6 +1,6 @@
 import { Rating } from "@mui/material";
 import ProfilePic from "../assets/test-profile-pic.jpg"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from '@mui/material/Button';
 import StyledMenu from "./StyledMenu";
 import MenuItem from '@mui/material/MenuItem';
@@ -15,6 +15,7 @@ const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
     const currentUserId = Cookies.get("userId");
     const [showMore, setShowMore] = useState(false);
     const [rating, setRating] = useState(0);
+    const pinnedRef = useRef();
     const CHAR_LIMIT = 500;
 
     useEffect(() => {
@@ -23,35 +24,38 @@ const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
             setShowMore(true);
         }
 
-        async function getUserRating(userId) {
-            const response = await fetch(`http://localhost:5000/api/collection/${userId}/game/${game.id}`);
+        async function getUserRating() {
+            const response = await fetch(`http://localhost:5000/api/collection/${user._id}/game/${game.id}`);
             if (response.ok) {
                 const { rating } = await response.json();
                 setRating(rating);
             }
         }
 
-        getUserRating(user._id);
-    }, [text.length, game.id, user._id]);
+        async function checkIfPinned() {
+            const response = await fetch(`http://localhost:5000/api/users/${user._id}/reviews/pinned`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.filter(review => review._id === id)) {
+                    pinnedRef.current = true;
+                } else {
+                    pinnedRef.current = false;
+                }
+            }
+        }
+
+        getUserRating();
+        if (user._id === currentUserId) {
+            checkIfPinned();
+        }
+    }, [id, text.length, game.id, user._id, currentUserId]);
 
     function limitChars(str, limit) {
         return str.length > limit ? `${str.slice(0, CHAR_LIMIT)}...` : str;
     }
 
-    async function handlePin(id) {
-        const response = await fetch(`http://localhost:5000/api/users/${user._id}/reviews/pin/${id}`, {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-
-        // TODO: Show alert when review is successfully pinned 
-    }
-
     return (
-        <div className="w-full md:w-3/4">
+        <div className="w-full">
             <hr />
             <div className="flex mt-4 mb-4">
                 <a href={`/game/${game.id}`} className="max-h-52 flex-shrink-0">
@@ -65,7 +69,13 @@ const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
                             </div>
                             <span>{user.username}</span>
                         </a>
-                        {currentUserId === user._id && <OptionsMenu handleEdit={handleEdit} handlePin={() => handlePin(id)} handleDelete={handleDelete}/>}
+                        {currentUserId === user._id && 
+                            <OptionsMenu 
+                                reviewId={id}
+                                pinned={pinnedRef.current}
+                                handleEdit={handleEdit} 
+                                handleDelete={handleDelete}/>
+                        }
                     </div>
                     <div className="flex items-center gap-2 mt-2">
                         <span>{game.name} ({game.release_dates[0].y})</span>
@@ -81,17 +91,43 @@ const ReviewCard = ({id, game, text, user, handleEdit, handleDelete}) => {
     )
 }
   
-const OptionsMenu = ({handleEdit, handlePin, handleDelete}) => {
+const OptionsMenu = ({reviewId, pinned, handleEdit, handleDelete}) => {
+    const currentUserId = Cookies.get("userId");
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-    
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
 
-    const handleClose = () => {
+
+    async function handlePin(id) {
+        const response = await fetch(`http://localhost:5000/api/users/${currentUserId}/reviews/pin/${id}`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        // TODO: Show alert when review is successfully pinned 
+    }
+
+    async function handleUnpin(id) {
+        const response = await fetch(`http://localhost:5000/api/users/${currentUserId}/reviews/pin/${id}`, {
+            method: "DELETE",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        
+        // TODO: Show alert when review is successfully pinned 
+    }
+    
+    function handleClick(event) {
+        setAnchorEl(event.currentTarget);
+    }
+
+    function handleClose() {
         setAnchorEl(null);
-    };
+    }
 
     return (
         <div>
@@ -120,9 +156,9 @@ const OptionsMenu = ({handleEdit, handlePin, handleDelete}) => {
             <EditIcon />
                 Edit
             </MenuItem>
-            <MenuItem onClick={handlePin} disableRipple>
+            <MenuItem onClick={pinned ? () => handlePin(reviewId) : () => handleUnpin(reviewId)} disableRipple>
             <PushPin />
-                Pin
+                {pinned ? "Pin" : "Unpin"}
             </MenuItem>
             <MenuItem onClick={handleDelete} disableRipple>
             <DeleteIcon />

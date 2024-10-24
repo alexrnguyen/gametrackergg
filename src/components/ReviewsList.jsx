@@ -8,6 +8,7 @@ const ReviewsList = ({reviewsList}) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
+    const [alertSuccess, setAlertSuccess] = useState(true);
     const [alertContent, setAlertContent] = useState("");
 
     useEffect(() => {
@@ -40,10 +41,13 @@ const ReviewsList = ({reviewsList}) => {
             // Review successfully deleted
             setReviews(reviews.filter(review => review._id !== reviewId));
             setShowAlert(true);
+            setAlertSuccess(true);
             setAlertContent("Successfully deleted review");
         } else {
             // Failed to delete review
-            // ...
+            setShowAlert(false);
+            setAlertSuccess(false);
+            setAlertContent("Failed to delete review. Please try again.");
         }
     }
 
@@ -66,7 +70,7 @@ const ReviewsList = ({reviewsList}) => {
                 })}
             </ul>
             <ReviewModal open={showModal} onClose={() => setShowModal(false)} reviewId={selectedReview} />
-            {showAlert ? <Alert severity="success" className="absolute bottom-5 left-5">{alertContent}</Alert> : null}
+            {showAlert && <Alert severity={alertSuccess ? "success" : "error"} className="absolute bottom-5 left-5">{alertContent}</Alert>}
         </>
     )
 }
