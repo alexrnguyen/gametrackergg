@@ -1,8 +1,8 @@
 import { ToggleButton, ToggleButtonGroup, CircularProgress, Button } from "@mui/material";
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from "react";
 import GameCard from "../components/GameCard";
-import ProfilePic from "../assets/test-profile-pic.jpg"
 import CategoryContainer from "../components/CategoryContainer";
 import AddGameCard from "../components/AddGameCard";
 import { TiDelete } from "react-icons/ti";
@@ -10,6 +10,7 @@ import SortSelector from "../components/SortSelector";
 import Cookies from "js-cookie";
 import ReviewsList from "../components/ReviewsList";
 import { useParams } from "react-router-dom";
+import ProfileImageModal from "../components/profile/ProfileImageModal";
 
 const StatsContainer = () => {
   // TODO: Implement container showing number of games in each category on the top of the Profile page
@@ -198,7 +199,7 @@ const ReviewsContent = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl">Reviews</h2>
         <SortSelector defaultValue={sortCriterion} onChange={handleCriterionChange} />
       </div>
@@ -215,12 +216,26 @@ const Profile = () => {
   const [user, setUser] = useState({});
   const [dataRetrieved, setDataRetrieved] = useState(false);
   const [followsUser, setFollowsUser] = useState(false);
+  const [hoverProfileImage, setHoverProfileImage] = useState(false);
+  const [showEditImageModal, setShowEditImageModal] = useState(false);
+
+  const styles = {
+    editIcon: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: "4rem", 
+      height: "4rem"
+    }
+  }
 
   useEffect(() => {
     async function getUser() {
       const response = await fetch(`http://localhost:5000/api/users/${uid}`);
       if (response.ok) {
         const userData = await response.json();
+        console.log(userData);
         setUser(userData);
         setDataRetrieved(true);
       }
@@ -280,8 +295,14 @@ const Profile = () => {
             <div className="flex justify-between items-center">
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-full w-24 h-24 border-black border-2 overflow-hidden">
-                    <img src={ProfilePic} alt="Profile Picture" />
+                  <div className="relative rounded-full w-24 h-24 border-black border-2 overflow-hidden">
+                    {hoverProfileImage && uid === currentUserId ? 
+                      <div className="w-full h-full bg-lightgrey bg-opacity-50" onMouseLeave={() => setHoverProfileImage(false)}>
+                        <ModeEditIcon style={styles.editIcon} onClick={() => setShowEditImageModal(true)}/> 
+                      </div>
+                      : 
+                      <img src={user.profileImageURL} alt="Profile Picture" onMouseEnter={() => setHoverProfileImage(true)} />
+                    }
                   </div>
                   <span className="text-2xl" id="profile-username">{user.username}</span>
                 </div>
@@ -304,6 +325,7 @@ const Profile = () => {
             </div>
           </header>
           {section === "showcase" ? <ShowcaseContent /> : (section === "games" ? <GamesContent /> : <ReviewsContent user={user} />)}
+          <ProfileImageModal open={showEditImageModal} onClose={() => setShowEditImageModal(false)} currentProfileImage={user.profileImageURL} />
         </div>
     : <div className="h-screen flex items-center justify-center"><CircularProgress/></div>}
     </>

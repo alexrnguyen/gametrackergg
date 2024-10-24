@@ -11,7 +11,8 @@ const UserSchema = new Schema({
     favourite_games: [{type: Number, ref: "Game"}],
     pinned_reviews: [{type: ReviewSchema}],
     following: [{type: mongoose.Schema.ObjectId, ref: "User"}],
-    followers: [{type: mongoose.Schema.ObjectId, ref: "User"}]
+    followers: [{type: mongoose.Schema.ObjectId, ref: "User"}],
+    profile_image_url: String
 });
 
 module.exports = mongoose.model("User", UserSchema);

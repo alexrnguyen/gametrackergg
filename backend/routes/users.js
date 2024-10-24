@@ -25,7 +25,7 @@ router.get("/:id", async (req, res) => {
         return res.status(404).send("User not found");
     }
 
-    res.status(200).send({_id: user._id, username: user.username, favouriteGames: user.favourite_games, following: user.following, followers: user.followers});
+    res.status(200).send({_id: user._id, username: user.username, favouriteGames: user.favourite_games, following: user.following, followers: user.followers, profileImageURL: user.profile_image_url});
 });
 
 // Get all user reviews
@@ -139,6 +139,34 @@ router.post("/:id/reviews/pin/:reviewId", isAuthorized, async (req, res) => {
     user.pinned_reviews.push(review);
     await user.save();
     return res.status(200).send();
+});
+
+// Remove a review from pinned reviews (unpin)
+router.delete("/:id/reviews/pin/:reviewId", isAuthorized, async (req, res) => {
+    const userId = req.params.id;
+    const reviewId = req.params.reviewId;
+
+    const user = await User.findById(userId);
+
+    if (user === null) {
+        return res.status(404).send("User not found");
+    }
+
+    const review = await Review.findById(reviewId);
+
+    if (review === null) {
+        return res.status(404).send("Review not found");
+    }
+
+    const reviewIds = user.pinned_reviews.map(review => review._id.toString());
+    if (!reviewIds.includes(review._id.toString())) {
+        return res.status(400).send("Review not pinned by user");
+    }
+
+    const indexOfReview = user.pinned_reviews.indexOf(review);
+    user.pinned_reviews.splice(indexOfReview, 1);
+    await user.save();
+    res.status(204).send();
 });
 
 // Get all users a user follows

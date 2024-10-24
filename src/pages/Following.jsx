@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import UserGrid from "../components/UserGrid";
+import UserGrid from "../components/UserList";
 import { useEffect, useState } from "react";
 
 const Following = () => {

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import UserGrid from "../components/UserGrid";
+import UserList from "../components/UserList";
 import { useEffect, useState } from "react";
 
 const Followers = () => {
@@ -21,7 +21,7 @@ const Followers = () => {
         <>
             <h1 className="text-2xl">Followers</h1>
             {followers.length === 0 ? <span>No results</span> : null}
-            <UserGrid users={followers}/>
+            <UserList users={followers}/>
         </>
     )
 }
